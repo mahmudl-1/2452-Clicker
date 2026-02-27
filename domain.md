@@ -10,60 +10,73 @@ date: Winter 2026
 classDiagram
     class Game{
         %% Assuming getters and constructors are placed
-        - clicker: ClickableCandy
-        - upgradeStore: UpgradeStore
+        - totalClicks: number
+        - clickDamage: number
+        - allUpgrades: Upgrade[]
+        - purchasedUpgrades: Upgrade[]
         + click() void
-        + buyUpgrade(id: string) boolean
+        %%Implements the upgrade, increases clicks and spends clicks
+        %%calls Upgrade apply
+        + buyUpgrade(upgrade: Upgrade) boolean
         + getTotalClicks() number
     }
     note for Game "Invariant Properties
-                    clicker and upgradeStore typeScript forces not null"   
+                    *totalClicks >= 0
+                    *clickDamage > 0
+                    *allUpgrades not null, ts forces it
+                    *purchasedUpgrades not null, ts forces it
+                    *allUpgrades.length == 2
+                    *purchasedUpgrade.length <= 2
+                    *allUpgrades loop no null element both upgrades should be present
+                    *purchasedUpgrade loop can be empty at first
+                    *purchasedUpgrade should contain no duplicates
+                    *purchasedUpgrades ⊆ allUpgrades"
     
-    class ClickableCandy{
-    %% Assuming getters and constructors are placed
-        - totalClicks: number
-        - clickDamage: number
-        + click() void
-        + increaseClickDamage(amount: number) void
-        + spendClicks(amount: number) void
-    }
-    note for ClickableCandy "Invariant Properties
-                             * totalClicks >= 0
-                             * clickDamage >= 1"                            
-    
-    class UpgradeStore{
-        - upgrades: Upgrade[]
-        + getUpgrades() Upgrade[]
-        + findUpgrade(id: string) Upgrade
-    }
-    %%length == 2 because exactly 2 upgrades required
-    note for UpgradeStore "Invariant Properties
-                           *upgrades.length == 2
-                           *2 upgrades id shouldn't be same
-                           *upgrades no null elements. Ts enforces no null"
-                           
     class Upgrade{
-        - id: string
-        - name: string
-        - cost: number
-        - clickIncreaseEffect: number
-        - purchased: boolean
-        + purchase() void
-        + isPurchased() boolean
+       <<interface>>
+       +name: string
+       +cost: number
+       +apply(Game: game) void
     }
-    note for Upgrade "Invariant Properties
-                      *id.length > 0
-                      *name.length >0
-                      *cost >= 0
-                      *clickIncreaseEffect >= 1
-                      *purchase not null enforced by TS
-                      *if purchase == true no purchase"   
     
-%% Composition
-    %%Game is composed of ClickableCandy and UpgradeStore
-    Game --* ClickableCandy 
-    Game --* UpgradeStore
-%% Aggregation
-    UpgradeStore --o Upgrade
+    note for Upgrade "Invariant Properties
+                      None since it is an interface"
+    
+    class UpgradeADD{
+        -name: string
+        -cost: number
+        -effect: number
+        +apply(game: Game) void
+    }
+    
+    note for UpgradeADD "Invariant Properties
+                         *name not null forced by ts
+                         *name.length >0
+                         *cost > 0
+                         *effect > 0
+                        "       
+    
+    class UpgradeMULT{
+        -name: string
+        -cost: number
+        -multFactor: number
+        +apply(game: Game) void
+    }
+    
+    note for UpgradeMULT "Invariant Properties
+                          *name not null forced by ts
+                          *name.length >0
+                          *cost >0 
+                          *multFactor > 1
+                          "
+    
+ %%Cardinality Aggregation
+    Game "1" --o "2" Upgrade: allUpgrades
+    Game "1" --o "0..2" Upgrade: purchasedUpgrades
+     
+%% Implements
+    UpgradeADD --|> Upgrade
+    UpgradeMULT --|> Upgrade
+    
     
 ```

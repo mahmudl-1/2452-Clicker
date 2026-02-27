@@ -14,19 +14,11 @@ flowchart
         DisplayMain==Clicked Candy Image==>UpdateDisplay
         UpdateDisplay-.Increased total Clicks by Click damage.->DisplayMain
         
-        checkPurchased{Checking Purchase history}
-        checkTotalClicks{Checking required clicks available}
-        DeductClicks{deducting clicks}
-        ApplyUpgrade{Increase clickDamage}
-        MarkPurchased[Making purchased true]
-        DisplayMain==Clicked on a upgrade text==>checkPurchased
-        checkPurchased-.Already Purchased before.->DisplayMain
-        checkPurchased-.Not Purchased.-> checkTotalClicks
-        checkTotalClicks-.Not sufficient clicks.->DisplayMain
-        checkTotalClicks-.Sufficient, deducting money.-> DeductClicks
-        DeductClicks-.Deducted, Applying.->ApplyUpgrade
-        ApplyUpgrade-.Applied upgrade correctly.->MarkPurchased
-        MarkPurchased-.Purchase complete.->UpdateDisplay
+        AttemptingPurchase{Processing do purchase?}
+        DisplayMain==Clicked on a upgrade text==>AttemptingPurchase
+        AttemptingPurchase-.Already Purchased before.->DisplayMain
+        AttemptingPurchase-.Not sufficient clicks.->DisplayMain
+        AttemptingPurchase-.Purchase complete.->UpdateDisplay
         
         
         DisplayMain==Clicked cross on tab==>End
