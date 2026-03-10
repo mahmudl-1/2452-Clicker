@@ -1,25 +1,25 @@
-import { Game } from "../domain/game";
+import { Game } from "../domain/Game";
 
 export class GameController{
-    game: Game;
+    #game: Game;
     constructor(){
-        this.game = new Game();
+        this.#game = new Game();
     }
 
     clickCandy(){
-        this.game.click();
+        this.#game.click();
         const counter = document.querySelector("#counter")!;
     }
 
     clickUpgradeADD(){
-        this.game.buyUpgrade(this.game.availableUpgrades[0]);
+        this.#game.buyUpgrade(this.#game.availableUpgrades[0]);
     }
 
     clickUpgradeMULT(){
-        this.game.buyUpgrade(this.game.availableUpgrades[1]);
+        this.#game.buyUpgrade(this.#game.availableUpgrades[1]);
     }
 
     get view(): number{
-        return this.game.TotalClicks;
+        return this.#game.TotalClicks;
     }
 }
