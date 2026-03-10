@@ -8,7 +8,6 @@ export class GameController{
 
     clickCandy(){
         this.#game.click();
-        const counter = document.querySelector("#counter")!;
     }
 
     clickUpgradeADD(){

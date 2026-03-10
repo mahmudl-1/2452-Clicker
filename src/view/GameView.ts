@@ -26,6 +26,9 @@ export class GameView{
             this.#gameController.clickCandy();
             counter.textContent = this.#gameController.view + "";
         });
+    }
+
+    updateCounter(){
         
     }
     
