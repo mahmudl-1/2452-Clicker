@@ -1,4 +1,5 @@
 import { Game } from "../domain/Game";
+import type { Upgrade } from "../domain/Upgrade";
 
 export class GameController{
     #game: Game;
@@ -6,19 +7,19 @@ export class GameController{
         this.#game = new Game();
     }
 
+    upgrades(): Upgrade[]{
+        return this.#game.availableUpgrades;
+    }
+
     clickCandy(){
         this.#game.click();
     }
 
-    clickUpgradeADD(){
-        this.#game.buyUpgrade(this.#game.availableUpgrades[0]);
+    clickUpgrade(upgrade: Upgrade){
+        return this.#game.buyUpgrade(upgrade);
     }
 
-    clickUpgradeMULT(){
-        this.#game.buyUpgrade(this.#game.availableUpgrades[1]);
-    }
-
-    get view(): number{
+    view(): number{
         return this.#game.TotalClicks;
     }
 }

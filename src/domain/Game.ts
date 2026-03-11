@@ -10,7 +10,7 @@ export class Game{
     constructor(){
         this.#totalClicks = 0;
         this.#clickDamage = 1;
-        this.#allUpgrades = [new UpgradeADD("Rolling pin", 5, 10), new UpgradeMULT("Candy worker", 20, 2)];
+        this.#allUpgrades = [new UpgradeADD("Rolling pin", 20, 10), new UpgradeMULT("Candy worker", 100, 2)];
         this.#purchasedUpgrades = [];
     }
 
@@ -25,16 +25,21 @@ export class Game{
 
     buyUpgrade(Upgrade: Upgrade): boolean{
         let alreadyPurchased = false;
+        let applied = false;
         for(let i: number = 0; i < this.#purchasedUpgrades.length; i++){
             if(Upgrade.name === this.#purchasedUpgrades[i].name){
                 alreadyPurchased = true;
             }
         }
         if(alreadyPurchased === false){
-            this.#purchasedUpgrades.push(Upgrade);
-            Upgrade.apply(this);
+            if(this.#totalClicks >= Upgrade.cost){
+                this.#purchasedUpgrades.push(Upgrade);
+                Upgrade.apply(this);
+                applied = true;
+                this.#totalClicks -= Upgrade.cost;
+            }
         }
-        return alreadyPurchased;
+        return applied;
     }
 
     set clickDmg(effect: number){

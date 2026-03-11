@@ -13,14 +13,23 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-.game{
-  text-align: center;
+button{
+  display: block;
+  margin-bottom: 10px;
 }
 
-#candy{
-  display: block;
-  size: 20px;
-  margin-top: 250px;
-  margin-left: 150px;
-  
+.game{
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  width: 100%;
+}
+
+.leftSide{
+  text-align: center
+}
+
+.rightSide{
+  width: 400px;;
+  padding-left: 40px;
 }

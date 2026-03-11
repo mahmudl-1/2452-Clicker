@@ -16,5 +16,4 @@ export class UpgradeADD implements Upgrade{
         game.clickDmg = this.#effect;
     }
 
-
 }
