@@ -5,7 +5,7 @@ export class GameView{
     constructor(){
         this.#gameController = new GameController();
         this.buildCandy();
-        this.buildUpgradeStore();
+        this.buildUpgrades();
     }
 
     buildCandy(){
@@ -24,7 +24,7 @@ export class GameView{
                     </p>
                 </div>
 
-                <div class="rightSide" id="upgradeStore">
+                <div class="rightSide" id="upgradeSection">
                     <h2>Upgrades</h2>
                 </div>
 
@@ -40,9 +40,9 @@ export class GameView{
         });
     }
 
-    buildUpgradeStore(){
-        const store = document.querySelector<HTMLDivElement>("#upgradeStore")!;
-        const upgrades = this.#gameController.upgrades();
+    buildUpgrades(){
+        const upgradeSection = document.querySelector<HTMLDivElement>("#upgradeSection")!;
+        const upgrades = [this.#gameController.upgradeAdd(), this.#gameController.upgradeMult()];
         
         upgrades.forEach((up: Upgrade) =>{
             const button = document.createElement("button");
@@ -58,7 +58,7 @@ export class GameView{
                 const counter = document.querySelector<HTMLSpanElement>("#counter")!;
                 counter.textContent = this.#gameController.view() + "";
             });
-            store.appendChild(button);
+            upgradeSection.appendChild(button);
         });
     
     }

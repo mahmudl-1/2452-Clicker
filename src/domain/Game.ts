@@ -4,13 +4,15 @@ import { UpgradeMULT } from "./UpgradeMULT";
 export class Game{
     #totalClicks: number;
     #clickDamage: number;
-    #allUpgrades: Upgrade[];
+    #upgradeADD: UpgradeADD;
+    #upgradeMULT: UpgradeMULT;
     #purchasedUpgrades: Upgrade[];
 
     constructor(){
         this.#totalClicks = 0;
         this.#clickDamage = 1;
-        this.#allUpgrades = [new UpgradeADD("Rolling pin", 20, 10), new UpgradeMULT("Candy worker", 100, 2)];
+        this.#upgradeADD = new UpgradeADD("Rolling pin", 20, 10);
+        this.#upgradeMULT = new UpgradeMULT("Candy worker", 100, 2);
         this.#purchasedUpgrades = [];
     }
 
@@ -18,8 +20,12 @@ export class Game{
         this.#totalClicks += this.#clickDamage;
     }
 
-    get availableUpgrades(): Upgrade[]{
-        return this.#allUpgrades;
+    get upgradeADD(): Upgrade{
+        return this.#upgradeADD;
+    }
+
+    get upgradeMULT(): Upgrade{
+        return this.#upgradeMULT;
     }
 
 

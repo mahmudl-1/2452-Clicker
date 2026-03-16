@@ -12,7 +12,8 @@ classDiagram
         %% Assuming getters and constructors are placed
         - totalClicks: number
         - clickDamage: number
-        - allUpgrades: Upgrade[]
+        - upgradeADD: UpgradeADD
+        - upgradeMULT: UpgradeMULT
         - purchasedUpgrades: Upgrade[]
         + click() void
         %%Implements the upgrade, increases clicks and spends clicks
@@ -23,14 +24,8 @@ classDiagram
     note for Game "Invariant Properties
                     *totalClicks >= 0
                     *clickDamage > 0
-                    *allUpgrades not null, ts forces it
-                    *purchasedUpgrades not null, ts forces it
                     *allUpgrades.length == 2
-                    *purchasedUpgrade.length <= 2
-                    *allUpgrades loop no null element both upgrades should be present
-                    *purchasedUpgrade loop can be empty at first
-                    *purchasedUpgrade should contain no duplicates
-                    *purchasedUpgrades ⊆ allUpgrades"
+                    *purchasedUpgrade should contain no duplicates"
     
     class Upgrade{
        <<interface>>
@@ -50,7 +45,6 @@ classDiagram
     }
     
     note for UpgradeADD "Invariant Properties
-                         *name not null forced by ts
                          *name.length >0
                          *cost > 0
                          *effect > 0
@@ -64,15 +58,14 @@ classDiagram
     }
     
     note for UpgradeMULT "Invariant Properties
-                          *name not null forced by ts
                           *name.length >0
                           *cost >0 
                           *multFactor > 1
                           "
     
- %%Cardinality Aggregation
-    Game "1" --o "2" Upgrade: allUpgrades
-    Game "1" --o "0..2" Upgrade: purchasedUpgrades
+ %%Cardinality composition
+    Game "1" --* "2" Upgrade: allUpgrades
+    Game "1" --* "0..2" Upgrade: purchasedUpgrades
      
 %% Implements
     UpgradeADD --|> Upgrade

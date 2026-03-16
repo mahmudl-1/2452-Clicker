@@ -14,14 +14,8 @@ flowchart
         DisplayMain==Clicked Candy Image==>UpdateDisplay
         UpdateDisplay-.Increased total Clicks by Click damage.->DisplayMain
         
-        AttemptingPurchase{Processing do purchase?}
-        DisplayMain==Clicked on a upgrade text==>AttemptingPurchase
-        AttemptingPurchase-.Already Purchased before.->DisplayMain
-        AttemptingPurchase-.Not sufficient clicks.->DisplayMain
-        AttemptingPurchase-.Purchase complete.->UpdateDisplay
-        
-        
-        DisplayMain==Clicked cross on tab==>End
-        End[[Closing the tab]]
+        DisplayMain==Clicked on a upgrade text==>UpdateDisplay
+        UpdateDisplay-.Already Purchased before.->DisplayMain
+        UpdateDisplay-.Not sufficient clicks.->DisplayMain
     end
 ```

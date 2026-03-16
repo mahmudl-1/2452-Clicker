@@ -7,8 +7,12 @@ export class GameController{
         this.#game = new Game();
     }
 
-    upgrades(): Upgrade[]{
-        return this.#game.availableUpgrades;
+    upgradeAdd(): Upgrade{
+        return this.#game.upgradeADD;
+    }
+
+    upgradeMult(): Upgrade{
+        return this.#game.upgradeMULT;
     }
 
     clickCandy(){
