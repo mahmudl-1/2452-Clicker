@@ -22,6 +22,10 @@ export class Game{
         this.#checkGame();
     }
 
+    get clickDamage(): number{
+        return this.#clickDamage;
+    }
+
     #checkGame(){
         assert(this.#totalClicks >= 0, "Total clicks must greater than or equals to zero.");
         assert(this.#clickDamage > 0, "Click damage must be greater than zero.");
