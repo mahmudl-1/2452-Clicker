@@ -63,9 +63,8 @@ classDiagram
                           "
     
  %%Cardinality composition
-    Game "1" --* "2" Upgrade: allUpgrades
-    Game "1" --* "0..2" Upgrade: purchasedUpgrades
-     
+    Game --* UpgradeADD
+    Game --* UpgradeMULT
 %% Implements
     UpgradeADD --|> Upgrade
     UpgradeMULT --|> Upgrade

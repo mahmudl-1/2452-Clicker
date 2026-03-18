@@ -3,8 +3,8 @@ title: Flows of interaction for my clicker project
 author: Mahmudl (mahmudl@myuamnitoba.ca)
 date: Winter 2026
 ---
-
 # Flows of interaction
+### Updated after feedback
 ```mermaid
 flowchart 
     subgraph ClickCandy 
