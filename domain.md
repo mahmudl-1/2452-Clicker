@@ -24,7 +24,6 @@ classDiagram
     note for Game "Invariant Properties
                     *totalClicks >= 0
                     *clickDamage > 0
-                    *allUpgrades.length == 2
                     *purchasedUpgrade should contain no duplicates"
     
     class Upgrade{
