@@ -1,5 +1,5 @@
-import { Game } from "../domain/Game";
-import type { Upgrade } from "../domain/Upgrade";
+import { Game } from "../model/Game";
+import type { Upgrade } from "../model/Upgrade";
 
 export class GameController{
     #game: Game;

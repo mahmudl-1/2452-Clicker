@@ -1,5 +1,5 @@
 import { GameController } from "../controller/GameController";
-import type { Upgrade } from "../domain/Upgrade";
+import type { Upgrade } from "../model/Upgrade";
 export class GameView{
     #gameController: GameController;
     constructor(){
