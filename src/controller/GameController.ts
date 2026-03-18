@@ -1,29 +1,29 @@
 import { Game } from "../model/Game";
 import type { Upgrade } from "../model/Upgrade";
+import { GameView } from "../view/GameView";
 
 export class GameController{
     #game: Game;
+    #gameView: GameView;
+
+    //4. initialize internal state.
+    //5. initialize the view for the internal state (the game)
     constructor(){
         this.#game = new Game();
+        this.#gameView = new GameView(this.#game, this);
     }
 
-    upgradeAdd(): Upgrade{
-        return this.#game.upgradeADD;
-    }
-
-    upgradeMult(): Upgrade{
-        return this.#game.upgradeMULT;
-    }
-
-    clickCandy(){
+    //11. Button clicked so letting domain know to change
+    candyClicked(): void{
         this.#game.click();
     }
 
-    clickUpgrade(upgrade: Upgrade){
-        return this.#game.buyUpgrade(upgrade);
+    getUpgrades(): Upgrade[]{
+        const upgrades: Upgrade[] = [this.#game.upgradeADD, this.#game.upgradeMULT];
+        return upgrades;
     }
 
-    view(): number{
-        return this.#game.TotalClicks;
+    upgradeClick(up: Upgrade): boolean{
+        return this.#game.buyUpgrade(up);
     }
 }

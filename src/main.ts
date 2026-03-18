@@ -1,7 +1,9 @@
-import { GameView } from "./view/GameView";
 import "./style.css"
+import { GameController } from "./controller/GameController";
 function main(){
-    new GameView();
+    //3. initializing the controller
+    new GameController();
 }
+
 
 main();

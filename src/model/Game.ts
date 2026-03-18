@@ -1,4 +1,5 @@
 import { assert } from "./Assertions";
+import type { Listener } from "./Listeners";
 import type { Upgrade } from "./Upgrade";
 import { UpgradeADD } from "./UpgradeADD";
 import { UpgradeMULT } from "./UpgradeMULT";
@@ -8,6 +9,8 @@ export class Game{
     #upgradeADD: UpgradeADD;
     #upgradeMULT: UpgradeMULT;
     #purchasedUpgrades: Upgrade[];
+    #gameListeners: Listener[];
+
 
     constructor(){
         this.#totalClicks = 0;
@@ -15,31 +18,32 @@ export class Game{
         this.#upgradeADD = new UpgradeADD("Rolling pin", 20, 10);
         this.#upgradeMULT = new UpgradeMULT("Candy worker", 100, 2);
         this.#purchasedUpgrades = [];
+        this.#gameListeners = new Array<Listener>();
         this.#checkGame();
     }
 
     #checkGame(){
         assert(this.#totalClicks >= 0, "Total clicks must greater than or equals to zero.");
         assert(this.#clickDamage > 0, "Click damage must be greater than zero.");
-        let duplicate = false;
-        const unique = new Set(this.#purchasedUpgrades);
-        for(const item of this.#purchasedUpgrades){
-            let count = 0;
-            for(const prod of unique){
-                if(prod.name === item.name){
-                    count++;
-                }
-            }
-            if(count > 1){
-                duplicate = true;
-            }
-        }
-        assert(!duplicate, "Upgrades cannot be purchased twice.")
+        const names = this.#purchasedUpgrades.map(u => u.name);
+        const unique = new Set(names);
+        assert(names.length === unique.size, "Upgrades cannot be purchased twice.");
+    }
+
+    //8. register the view for listening for update.
+    registerListener(listener: Listener): void{
+        assert(listener !== null, "Listener cannot be null");
+        this.#gameListeners.push(listener);
+    }
+
+    #notifyAll():void{
+        this.#gameListeners.forEach(l => l.notify());
     }
 
     click(): void{
         this.#totalClicks += this.#clickDamage;
         this.#checkGame();
+        this.#notifyAll();
     }
 
     get upgradeADD(): Upgrade{
@@ -51,27 +55,27 @@ export class Game{
     }
 
 
-    buyUpgrade(Upgrade: Upgrade): boolean{
-        let alreadyPurchased = false;
+    buyUpgrade(upgrade: Upgrade): boolean{
+        assert(upgrade !== null, "Upgrade cannot be null");
         let applied = false;
-        for(let i: number = 0; i < this.#purchasedUpgrades.length; i++){
-            if(Upgrade.name === this.#purchasedUpgrades[i].name){
-                alreadyPurchased = true;
-            }
-        }
+        const alreadyPurchased = this.#purchasedUpgrades.some(up => up.name === upgrade.name);
         if(alreadyPurchased === false){
-            if(this.#totalClicks >= Upgrade.cost){
-                this.#purchasedUpgrades.push(Upgrade);
-                Upgrade.apply(this);
+            if(this.#totalClicks >= upgrade.cost){
+                this.#purchasedUpgrades.push(upgrade);
+                upgrade.apply(this);
                 applied = true;
-                this.#totalClicks -= Upgrade.cost;
+                this.#totalClicks -= upgrade.cost;
             }
         }
         this.#checkGame();
+        if(applied){
+            this.#notifyAll();
+        }
         return applied;
     }
 
     set clickDmg(effect: number){
+        assert(effect !== 0, "The effect to apply cannot be zero");
         if(effect < 0){
             this.#clickDamage *= (-1*effect);
             this.#checkGame();
@@ -79,6 +83,8 @@ export class Game{
             this.#clickDamage += effect;
             this.#checkGame();
         }
+        this.#checkGame();
+        this.#notifyAll();
     }
 
     get TotalClicks(): number{
