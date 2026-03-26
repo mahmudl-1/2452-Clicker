@@ -25,14 +25,14 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>16/16</span>
+                <span class='fraction'>10/10</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>6/6</span>
+                <span class='fraction'>0/0</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>16/16</span>
+                <span class='fraction'>10/10</span>
             </div>
         
             
@@ -90,15 +90,7 @@
 <a name='L25'></a><a href='#L25'>25</a>
 <a name='L26'></a><a href='#L26'>26</a>
 <a name='L27'></a><a href='#L27'>27</a>
-<a name='L28'></a><a href='#L28'>28</a>
-<a name='L29'></a><a href='#L29'>29</a>
-<a name='L30'></a><a href='#L30'>30</a>
-<a name='L31'></a><a href='#L31'>31</a>
-<a name='L32'></a><a href='#L32'>32</a>
-<a name='L33'></a><a href='#L33'>33</a>
-<a name='L34'></a><a href='#L34'>34</a>
-<a name='L35'></a><a href='#L35'>35</a>
-<a name='L36'></a><a href='#L36'>36</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L28'></a><a href='#L28'>28</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -108,30 +100,22 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">6x</span>
-<span class="cline-any cline-yes">6x</span>
-<span class="cline-any cline-yes">6x</span>
-<span class="cline-any cline-yes">6x</span>
-<span class="cline-any cline-yes">6x</span>
-<span class="cline-any cline-yes">6x</span>
-<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">8x</span>
-<span class="cline-any cline-yes">8x</span>
-<span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-yes">7x</span>
+<span class="cline-any cline-yes">7x</span>
+<span class="cline-any cline-yes">7x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { assert } from "./Assertions";
 import type { Game } from "./Game";
@@ -143,9 +127,6 @@ export class UpgradeMULT implements Upgrade{
     #multFactor: number;
 &nbsp;
     constructor(name: string, cost: number, multFactor: number){
-        assert(name.length &gt; 0, "Name for an upgrade given as input should not be empty.");
-        assert(cost &gt; 0, "The input for upgrade cost must be greater than zero.");
-        assert(multFactor &gt; 1 || multFactor &lt; -1, "The input absolute value for multiply factor of an Upgrade must be greater than one.");
         this.name = name;
         this.cost = cost;
         this.#multFactor = multFactor;
@@ -155,18 +136,13 @@ export class UpgradeMULT implements Upgrade{
     #checkUpgradeMult(){
         assert(this.name.length &gt; 0, "The name of the upgrade should not be empty.");
         assert(this.cost &gt; 0, "A upgrade cost must be greater than zero.");
-        assert(this.#multFactor &gt; 1 || this.#multFactor &lt; -1, "An absolute multiply factor for an upgrade must be greater than one.");
+        assert(this.#multFactor &gt; 1, "A multiply factor for an upgrade must be greater than one.");
     }
 &nbsp;
-    apply(game: Game): void {
+    apply(game: Game): number {
         assert(game !== null, "The game being passed as an input should not be null.");
-        if(this.#multFactor &lt; 0){
-            game.clickDmg = this.#multFactor;
-            this.#checkUpgradeMult();
-        }else{
-            game.clickDmg = (-1*this.#multFactor);
-            this.#checkUpgradeMult();
-        }
+        this.#checkUpgradeMult();
+        return game.clickDamage*this.#multFactor;
     }
 }</pre></td></tr></table></pre>
 
@@ -175,7 +151,7 @@ export class UpgradeMULT implements Upgrade{
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-03-18T08:10:03.065Z
+                at 2026-03-25T09:53:41.332Z
             </div>
         <script src="prettify.js"></script>
         <script>

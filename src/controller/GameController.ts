@@ -1,3 +1,4 @@
+import { NotSuffecientClicksException } from "../model/Exceptions/NotSuffecientClicksException";
 import { Game } from "../model/Game";
 import type { Upgrade } from "../model/Upgrade";
 import { GameView } from "../view/GameView";
@@ -23,7 +24,13 @@ export class GameController{
         return upgrades;
     }
 
-    upgradeClick(up: Upgrade): boolean{
-        return this.#game.buyUpgrade(up);
+    upgradeClick(up: Upgrade): void{
+        try{
+            this.#game.buyUpgrade(up);
+        }catch(e: any){
+            if(e instanceof NotSuffecientClicksException){
+                throw new NotSuffecientClicksException();
+            }
+        }
     }
 }

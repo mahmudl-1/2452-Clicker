@@ -3,7 +3,7 @@ import{UpgradeMULT} from '../../src/model/UpgradeMULT';
 import{Game} from '../../src/model/Game';
 
 test("Can click on the Candy", (): void => {
-    let upgrade = new UpgradeMULT("Candy worker", 1, -2);
+    let upgrade = new UpgradeMULT("Candy worker", 1, 2);
     let game = new Game();
     let previousClickDmg = game.clickDamage;
     game.click();

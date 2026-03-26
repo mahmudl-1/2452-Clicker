@@ -64,29 +64,29 @@ export class GameView implements Listener{
     buildUpgrades(){
         const upgradeSection = document.querySelector<HTMLDivElement>("#upgradeSection")!;
         const upgrades: Upgrade[]= this.#gameController.getUpgrades();
-        
+        let index = 0;
         upgrades.forEach((up: Upgrade) =>{
             const button = document.createElement("button");
-
+            button.id = "button"+String(index);
+            index++;
             button.textContent = `${up.name}  (Cost: ${up.cost} clicks)`;
 
             button.addEventListener("click", () => {
                 const messageBox = document.querySelector<HTMLParagraphElement>("#message")!;
-                const purchased = this.#gameController.upgradeClick(up);
-                if(!purchased){
-                    messageBox.style.color = "red";
-                    messageBox.textContent = "Insuffecient clicks!";
-                    setTimeout(()=>{
-                        messageBox.textContent = "";
-                    }, 1000);
-                }else{
+                try{
+                    this.#gameController.upgradeClick(up);
                     messageBox.style.color = "green";
                     messageBox.textContent = "Click damage increased"
                     setTimeout(()=>{
                         messageBox.textContent = "";
                     }, 1000);
+                }catch(e:any){
+                    messageBox.style.color = "red";
+                    messageBox.textContent = "Insuffecient clicks!";
+                    setTimeout(()=>{
+                        messageBox.textContent = "";
+                    }, 1000);
                 }
-                button.disabled = purchased;
             });
             upgradeSection.appendChild(button);
         });

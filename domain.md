@@ -14,17 +14,15 @@ classDiagram
         - clickDamage: number
         - upgradeADD: UpgradeADD
         - upgradeMULT: UpgradeMULT
-        - purchasedUpgrades: Upgrade[]
+        - gameListeners: Listener[]
         + click() void
         %%Implements the upgrade, increases clicks and spends clicks
         %%calls Upgrade apply
         + buyUpgrade(upgrade: Upgrade) boolean
-        + getTotalClicks() number
     }
     note for Game "Invariant Properties
                     *totalClicks >= 0
-                    *clickDamage > 0
-                    *purchasedUpgrade should contain no duplicates"
+                    *clickDamage > 0 "
     
     class Upgrade{
        <<interface>>
@@ -40,7 +38,7 @@ classDiagram
         -name: string
         -cost: number
         -effect: number
-        +apply(game: Game) void
+        +apply(game: Game) number
     }
     
     note for UpgradeADD "Invariant Properties
@@ -53,7 +51,7 @@ classDiagram
         -name: string
         -cost: number
         -multFactor: number
-        +apply(game: Game) void
+        +apply(game: Game) number
     }
     
     note for UpgradeMULT "Invariant Properties
