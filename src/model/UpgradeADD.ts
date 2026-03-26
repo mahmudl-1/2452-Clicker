@@ -6,6 +6,7 @@ export class UpgradeADD implements Upgrade{
     name: string;
     cost: number;
     #effect: number;
+    
 
     constructor(name: string, cost: number, effect: number){
         this.name = name;

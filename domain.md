@@ -8,13 +8,13 @@ date: Winter 2026
 
 ```mermaid
 classDiagram
+    %% Lecture 9
     class Game{
         %% Assuming getters and constructors are placed
         - totalClicks: number
         - clickDamage: number
         - upgradeADD: UpgradeADD
         - upgradeMULT: UpgradeMULT
-        - gameListeners: Listener[]
         + click() void
         %%Implements the upgrade, increases clicks and spends clicks
         %%calls Upgrade apply
@@ -26,16 +26,18 @@ classDiagram
     
     class Upgrade{
        <<interface>>
-       +name: string
+       +~name: string
+       -game: Game
        +cost: number
-       +apply(Game: game) void
+       +apply(Game: game) number
     }
     
     note for Upgrade "Invariant Properties
                       None since it is an interface"
     
     class UpgradeADD{
-        -name: string
+        -~name: string
+        -game: Game
         -cost: number
         -effect: number
         +apply(game: Game) number
@@ -48,7 +50,8 @@ classDiagram
                         "       
     
     class UpgradeMULT{
-        -name: string
+        -~name: string
+        -game: Game
         -cost: number
         -multFactor: number
         +apply(game: Game) number
@@ -61,8 +64,11 @@ classDiagram
                           "
     
  %%Cardinality composition
-    Game --* UpgradeADD
-    Game --* UpgradeMULT
+    Game "1" --* "+" UpgradeADD
+    Game "1" --* "+" UpgradeMULT
+%% cardinality aggregation
+    UpgradeADD "1" --o "1" Game
+    UpgradeMULT "1" --o "1" Game
 %% Implements
     UpgradeADD --|> Upgrade
     UpgradeMULT --|> Upgrade
