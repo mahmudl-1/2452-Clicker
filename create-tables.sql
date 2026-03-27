@@ -1,29 +1,50 @@
+create table if not exists Player(
+    username varchar(255) unique not null,
+    password varchar(255) unique not null
+);
+
 create table if not exists Game(
-    id serial unique not null primary key,
-    totalClicks integer not null check(totalClicks >= 0),
-    clickDamage integer not null check(clickDamage > 0)
+    id serial unique not null,
+    totalClicks integer not null,
+    clickDamage integer not null,
+    player_username varchar(255) unique not null,
+    foreign key (player_username) references Player(username) on delete Cascade
 );
 
 create table if not exists UpgradeADD(
-    name varchar(255) unique not null primary key,
-    cost integer not null check (cost > 0),
-    effect integer not null check (effect > 0),
-    game_id serial not null,
+    name varchar(255) unique not null,
+    description varchar(255),
+    cost integer not null,
+    effect integer not null,
+    game_id integer not null,
     --when the game is deleted upgradeadd will be deleted too
     foreign key(game_id) references Game(id) on delete Cascade
 );
 
 create table if not exists UpgradeMULT(
-    name varchar(255) unique not null primary key,
-    cost integer not null check (cost > 0),
-    multFactor integer not null check (multFactor > 1),
-    game_id serial not null,
+    name varchar(255) unique not null,
+    description varchar(255),
+    cost integer not null,
+    multFactor integer not null,
+    game_id integer not null,
     --when the game is deleted upgrademult will be deleted too
     foreign key(game_id) references Game(id) on delete Cascade
 );
 
---insert into Game(id, totalClicks, clickDamage) values(0,0,1) on conflict (id) do nothing;
+create table if not exists BasicBuilding(
+    name varchar(255) unique not null,
+    description varchar(255),
+    cost integer not null,
+    clicksPerSecond integer not null,
+    game_id integer not null,
+    foreign key(game_id) references Game(id) on delete Cascade
+);
 
---insert into UpgradeADD(name,cost,effect,game_id) values('Rolling pin', 20, 10, 0) on conflict (name) do nothing;
-
---insert into UpgradeMULT(name,cost,multFactor,game_id) values('Candy worker', 100, 2, 0) on conflict (name) do nothing;
+create table if not exists AdvancedBuilding(
+    name varchar(255) unique not null,
+    description varchar(255),
+    cost integer not null,
+    clicksPerSecond integer not null,
+    game_id integer not null,
+    foreign key(game_id) references Game(id) on delete Cascade
+);
