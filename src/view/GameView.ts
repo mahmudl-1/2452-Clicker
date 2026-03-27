@@ -2,9 +2,15 @@ import type { GameController } from "../controller/GameController";
 import type { Game } from "../model/Game";
 import type { Listener } from "../model/Listeners";
 import type { Upgrade } from "../model/Upgrade";
+
+//This is the view of the Game which has task of setting up the candy and the upgrades on the screen
+//and letting the user know of any change or recieve inputs
 export class GameView implements Listener{
     #game: Game;
     #gameController: GameController;
+    #currentMessage: string = ""; //feedback message box
+    #messageColour: string = ""; // the colours of the text
+
     constructor(game: Game, gameController: GameController){
         this.#game = game;
 
@@ -18,14 +24,22 @@ export class GameView implements Listener{
         this.buildUpgrades();
     }
 
+    //render
     notify(){
         //rerendering the view for our Candy game
         this.#updateUI();
     }
 
+    //when notified automatically render the click count and the feedback message
     #updateUI(){
         const counter = document.querySelector("#counter")!;
         counter.textContent = String(this.#game.TotalClicks);
+
+        const messageBox = document.querySelector<HTMLParagraphElement>("#message");
+        if(messageBox){
+            messageBox.textContent = this.#currentMessage;
+            messageBox.style.color = this.#messageColour;
+        }
     }
 
     //9. Setting up the view for the objects I'm clicking
@@ -72,19 +86,23 @@ export class GameView implements Listener{
             button.textContent = `${up.name}  (Cost: ${up.cost} clicks)`;
 
             button.addEventListener("click", () => {
-                const messageBox = document.querySelector<HTMLParagraphElement>("#message")!;
+                //changed to catch error and render the message on change
                 try{
+                    this.#currentMessage = "Click damage increased!";
+                    this.#messageColour = "green";
                     this.#gameController.upgradeClick(up);
-                    messageBox.style.color = "green";
-                    messageBox.textContent = "Click damage increased"
+
                     setTimeout(()=>{
-                        messageBox.textContent = "";
+                        this.#currentMessage = "";
+                        this.#updateUI();
                     }, 1000);
                 }catch(e:any){
-                    messageBox.style.color = "red";
-                    messageBox.textContent = "Insuffecient clicks!";
+                    this.#currentMessage = "Insuffecient Clicks!";
+                    this.#messageColour = "red";
+                    this.#updateUI();
                     setTimeout(()=>{
-                        messageBox.textContent = "";
+                        this.#currentMessage = "";
+                        this.#updateUI();
                     }, 1000);
                 }
             });

@@ -4,6 +4,9 @@ import type { Listener } from "./Listeners";
 import type { Upgrade } from "./Upgrade";
 import { UpgradeADD } from "./UpgradeADD";
 import { UpgradeMULT } from "./UpgradeMULT";
+/*The main class that holds the candy information like the total clicks
+    the click damage and all the upgrades and buildings purchasable
+    It is also responsible for managing the listener pattern notifying the view.*/
 export class Game{
     #totalClicks: number;
     #clickDamage: number;
@@ -24,6 +27,7 @@ export class Game{
         return this.#clickDamage;
     }
 
+    // Pre/post Conditions check
     #checkGame(){
         assert(this.#totalClicks >= 0, "Total clicks must greater than or equals to zero.");
         assert(this.#clickDamage > 0, "Click damage must be greater than zero.");
@@ -35,10 +39,13 @@ export class Game{
         this.#gameListeners.push(listener);
     }
 
+    //notify the view of the changes
     #notifyAll():void{
         this.#gameListeners.forEach(l => l.notify());
     }
 
+    //This method when invoked increments the total clicks by 1
+    //and notifies the view of the change in total clicks
     click(): void{
         this.#totalClicks += this.#clickDamage;
         this.#checkGame();
@@ -53,7 +60,11 @@ export class Game{
         return this.#upgradeMULT;
     }
 
-
+    /*This method takes an upgrade as an input and uses it to change the total clicks
+        of the user by the Effect of the upgrade. If the user has suffecient total clicks
+        this method can apply the upgrade otherwise does nothing.
+        After applying the upgrade it notifies all listeners(view) that change has taken place
+        input: Upgrade, the upgrade that was clicked */
     buyUpgrade(upgrade: Upgrade): void{
         assert(upgrade !== null, "Upgrade cannot be null");
         let applied = false;
