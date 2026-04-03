@@ -13,7 +13,8 @@ export class Game{
     #upgradeADD: UpgradeADD;
     #upgradeMULT: UpgradeMULT;
     #gameListeners: Listener[];
-
+    //updated for storing each upgrade in the inventory
+    #purchasedUpgrades: Upgrade[];
 
     constructor(){
         this.#totalClicks = 0;
@@ -21,8 +22,10 @@ export class Game{
         this.#upgradeADD = new UpgradeADD("Rolling pin", 20, 10);
         this.#upgradeMULT = new UpgradeMULT("Candy worker", 100, 2);
         this.#gameListeners = new Array<Listener>();
+        this.#purchasedUpgrades = new Array<Upgrade>();
         this.#checkGame();
     }
+
     get clickDamage(): number{
         return this.#clickDamage;
     }
@@ -60,6 +63,10 @@ export class Game{
         return this.#upgradeMULT;
     }
 
+    get purchasedUpgrades(): Upgrade[]{
+        return this.#purchasedUpgrades;
+    }
+
     /*This method takes an upgrade as an input and uses it to change the total clicks
         of the user by the Effect of the upgrade. If the user has suffecient total clicks
         this method can apply the upgrade otherwise does nothing.
@@ -70,8 +77,11 @@ export class Game{
         let applied = false;
         if(this.#totalClicks >= upgrade.cost){
             this.#clickDamage = upgrade.apply(this);
-            applied = true;
             this.#totalClicks -= upgrade.cost;
+            //Updated to register every upgrade in the inventory
+            this.#purchasedUpgrades.push(upgrade);
+            applied = true;
+            
         }else{
             throw new NotSuffecientClicksException();
         }
