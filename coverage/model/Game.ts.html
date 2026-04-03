@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">96.55% </span>
+                <span class="strong">93.75% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>28/29</span>
+                <span class='fraction'>30/32</span>
             </div>
         
             
@@ -37,16 +37,16 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">91.66% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>11/11</span>
+                <span class='fraction'>11/12</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">96.42% </span>
+                <span class="strong">93.54% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>27/28</span>
+                <span class='fraction'>29/31</span>
             </div>
         
             
@@ -149,7 +149,18 @@
 <a name='L84'></a><a href='#L84'>84</a>
 <a name='L85'></a><a href='#L85'>85</a>
 <a name='L86'></a><a href='#L86'>86</a>
-<a name='L87'></a><a href='#L87'>87</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L87'></a><a href='#L87'>87</a>
+<a name='L88'></a><a href='#L88'>88</a>
+<a name='L89'></a><a href='#L89'>89</a>
+<a name='L90'></a><a href='#L90'>90</a>
+<a name='L91'></a><a href='#L91'>91</a>
+<a name='L92'></a><a href='#L92'>92</a>
+<a name='L93'></a><a href='#L93'>93</a>
+<a name='L94'></a><a href='#L94'>94</a>
+<a name='L95'></a><a href='#L95'>95</a>
+<a name='L96'></a><a href='#L96'>96</a>
+<a name='L97'></a><a href='#L97'>97</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -173,6 +184,8 @@
 <span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">7x</span>
@@ -212,17 +225,24 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -250,7 +270,8 @@ export class Game{
     #upgradeADD: UpgradeADD;
     #upgradeMULT: UpgradeMULT;
     #gameListeners: Listener[];
-&nbsp;
+    //updated for storing each upgrade in the inventory
+    #purchasedUpgrades: Upgrade[];
 &nbsp;
     constructor(){
         this.#totalClicks = 0;
@@ -258,8 +279,10 @@ export class Game{
         this.#upgradeADD = new UpgradeADD("Rolling pin", 20, 10);
         this.#upgradeMULT = new UpgradeMULT("Candy worker", 100, 2);
         this.#gameListeners = new Array&lt;Listener&gt;();
+        this.#purchasedUpgrades = new Array&lt;Upgrade&gt;();
         this.#checkGame();
     }
+&nbsp;
     get clickDamage(): number{
         return this.#clickDamage;
     }
@@ -297,6 +320,10 @@ export class Game{
         return this.#upgradeMULT;
     }
 &nbsp;
+    get <span class="fstat-no" title="function not covered" >purchasedUpgrades(): Upgrade[]{</span>
+<span class="cstat-no" title="statement not covered" >        return this.#purchasedUpgrades;</span>
+    }
+&nbsp;
     /*This method takes an upgrade as an input and uses it to change the total clicks
         of the user by the Effect of the upgrade. If the user has suffecient total clicks
         this method can apply the upgrade otherwise does nothing.
@@ -307,8 +334,11 @@ export class Game{
         let applied = false;
         if(this.#totalClicks &gt;= upgrade.cost){
             this.#clickDamage = upgrade.apply(this);
-            applied = true;
             this.#totalClicks -= upgrade.cost;
+            //Updated to register every upgrade in the inventory
+            this.#purchasedUpgrades.push(upgrade);
+            applied = true;
+            
         }else<span class="missing-if-branch" title="else path not taken" >E</span>{
 <span class="cstat-no" title="statement not covered" >            throw new NotSuffecientClicksException();</span>
         }
@@ -328,7 +358,7 @@ export class Game{
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-03-27T10:00:37.341Z
+                at 2026-04-03T15:15:34.368Z
             </div>
         <script src="../prettify.js"></script>
         <script>
