@@ -30,7 +30,7 @@ classDiagram
         -~password: string
         -game: Game
         %%listener pattern
-        -createGameAccount(): void
+        +createGameAccount(): void
         +login(): void
     }
     note for Player "Invariant Properties
@@ -45,7 +45,11 @@ classDiagram
         - upgradeMULT: UpgradeMULT[]
         - basicBuilding: BasicBuilding
         - AdvancedBuilding: AdvancedBuilding
+        %%name changed to inventory for cleaner name
+        - Inventory: Purchasable[] 
         %%controller calls this for auto click through setInterval
+        %%While implementing, I found this method was necessary
+        + autoClickTick() void
         + click() void
         %%Implements the upgrade, increases clicks and spends clicks
         %%calls Upgrade apply
@@ -151,8 +155,8 @@ classDiagram
     Game "1" --* "+" UpgradeADD
     Game "1" --* "+" UpgradeMULT
     
-    Game "1" --* "+" BasicBuilding
-    Game "1" --* "+" AdvancedBuilding
+    Game "1" --* "1" BasicBuilding
+    Game "1" --* "1" AdvancedBuilding
     
 %% cardinality aggregation
     Game "1" --o "1" Player

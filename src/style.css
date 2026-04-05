@@ -2,34 +2,111 @@
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
-
-  color-scheme: light dark;
   color: rgb(0, 0, 0);
   background-color: #ffffff;
-
-  font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-button{
-  display: block;
-  margin-bottom: 10px;
+.game {
+    display: flex;
+    justify-content: center; 
+    gap: 50px;              
+    align-items: flex-start;
+    padding: 40px;
+    max-width: 1200px;
+    margin: 0 auto;
 }
 
-.game{
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  width: 100%;
+.leftSide {
+    text-align: center;
+    background: #fff;
+    padding: 30px;
+    border-radius: 25px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.08); 
+    min-width: 350px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
 }
 
-.leftSide{
-  text-align: center
+.rightSide {
+    width: 400px;
+    background: #fff;
+    padding: 25px;
+    border-radius: 25px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
 }
 
-.rightSide{
-  width: 400px;;
-  padding-left: 40px;
+
+#candy {
+    transition: transform 0.1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    filter: drop-shadow(0px 10px 10px rgba(0,0,0,0.1));
+    margin: 20px 0;
+    user-select: none; 
+    -webkit-user-drag: none; 
+    width: 180px; 
+    image-rendering: pixelated;
+    mix-blend-mode: multiply; 
+    filter: drop-shadow(0px 10px 15px rgba(0,0,0,0.1));
+}
+
+#candy:hover {
+    transform: scale(1.08);
+    filter: drop-shadow(0px 15px 20px rgba(0,0,0,0.2));
+}
+
+#candy:active {
+    transform: scale(0.92); 
+}
+
+
+button {
+    font-size: 1rem;
+    color: #444;
+    transition: all 0.2s ease;
+    border: 2px solid #f0f0f0;
+    background-color: #ffffff;
+    cursor: pointer;
+    border-radius: 12px; /* Smoother corners */
+}
+
+button:hover {
+    border-color: #ff6b6b;
+    color: #ff6b6b;
+    box-shadow: 0 4px 12px rgba(255, 107, 107, 0.2);
+    transform: translateX(5px); /* Slides right slightly when hovering */
+}
+
+button:active {
+    transform: translateY(0px);
+}
+
+body {
+    background: linear-gradient(135deg, #fdfcfb 0%, #e2d1c3 100%);
+    /* Or a more "candy" version: */
+    /* background: linear-gradient(135deg, #fff5f5 0%, #ffe3e3 100%); */
+    min-height: 100vh;
+    margin: 0;
+}
+
+h2 {
+    font-size: 1.8rem;
+    color: #333;
+    margin-bottom: 15px;
+    position: relative;
+}
+
+/* Adds a cute little accent line under the headers */
+h2::after {
+    content: '';
+    display: block;
+    width: 40px;
+    height: 4px;
+    background: #ff6b6b;
+    border-radius: 2px;
+    margin-top: 4px;
 }

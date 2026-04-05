@@ -1,4 +1,5 @@
 import type { GameController } from "../controller/GameController";
+import type { Building } from "../model/Building";
 import type { Game } from "../model/Game";
 import type { Listener } from "../model/Listeners";
 import type { Upgrade } from "../model/Upgrade";
@@ -22,6 +23,7 @@ export class GameView implements Listener{
 
         this.buildCandy();
         this.buildUpgrades();
+        this.buildBuildings();
     }
 
     //render
@@ -59,8 +61,14 @@ export class GameView implements Listener{
                     </p>
                 </div>
 
-                <div class="rightSide" id="upgradeSection">
-                    <h2>Upgrades</h2>
+                <div class="rightSide" id="StoreSection">
+                    <div id= "upgradeSection">
+                        <h2>Upgrades</h2>
+                    </div>
+
+                    <div id="buildingSection" style="margin-top: 20px;">
+                        <h2>Buildings</h2>
+                    </div>
                     <p id="message" style="color: red; font-weight: bold; height: 24px;"></p>
                 </div>
 
@@ -78,19 +86,33 @@ export class GameView implements Listener{
     buildUpgrades(){
         const upgradeSection = document.querySelector<HTMLDivElement>("#upgradeSection")!;
         const upgrades: Upgrade[]= this.#gameController.getUpgrades();
-        let index = 0;
-        upgrades.forEach((up: Upgrade) =>{
+        upgrades.forEach((up: Upgrade, index: number) =>{
             const button = document.createElement("button");
-            button.id = "button"+String(index);
-            index++;
-            button.textContent = `${up.name}  (Cost: ${up.cost} clicks)`;
+            button.id = "upButton"+ String(index);
+            
+            //Button styling
+            button.style.display = "block";
+            button.style.width = "100%"; 
+            button.style.textAlign = "left"; 
+            button.style.marginBottom = "10px";
+            button.style.padding = "8px 12px"; 
+            button.style.cursor = "pointer"; 
+            button.style.borderRadius = "6px"; 
+            button.style.border = "1px solid #ccc";
+
+            let descriptionText = "";
+            if(up.description !== ""){
+                descriptionText = `<br><span style="font-size: 0.85em; color: #555;"><i>${up.description}</i></span>`;
+            }
+            
+            button.innerHTML = `<strong>${up.name}</strong> (Cost: ${up.cost} clicks) ${descriptionText}`;
 
             button.addEventListener("click", () => {
                 //changed to catch error and render the message on change
                 try{
-                    this.#currentMessage = "Click damage increased!";
+                    this.#currentMessage = `${up.name} purchased!`;
                     this.#messageColour = "green";
-                    this.#gameController.upgradeClick(up);
+                    this.#gameController.purchasableClicked(up);
 
                     setTimeout(()=>{
                         this.#currentMessage = "";
@@ -109,5 +131,54 @@ export class GameView implements Listener{
             upgradeSection.appendChild(button);
         });
     
+    }
+
+    buildBuildings(){
+        const buildingSection = document.querySelector<HTMLDivElement>("#buildingSection")!;
+        const buildings: Building[] = this.#gameController.getBuildings();
+
+        buildings.forEach((building: Building, index: number) =>{
+            const button = document.createElement("button");
+            button.id = "buildButton" + String(index);
+
+            //button styling
+            button.style.display = "block";
+            button.style.width = "100%";
+            button.style.textAlign = "left";
+            button.style.marginBottom = "10px";
+            button.style.padding = "8px 12px";
+            button.style.cursor = "pointer";
+            button.style.borderRadius = "6px";
+            button.style.border = "1px solid #ccc";
+
+            let descriptionText = "";
+            if (building.description !== "") {
+                descriptionText = `<br><span style="font-size: 0.85em; color: #555;"><i>${building.description}</i></span>`;
+            }
+
+            button.innerHTML = `<strong>${building.name}</strong> (+${building.clickPerSecond} CPS | Cost: ${building.cost}) ${descriptionText}`;
+
+            button.addEventListener("click", () =>{
+                try{
+                    this.#currentMessage = `${building.name} purchased!`;
+                    this.#messageColour = "green";
+                    this.#gameController.purchasableClicked(building);
+
+                    setTimeout(()=>{
+                        this.#currentMessage = "";
+                        this.#updateUI();
+                    }, 1000);
+                }catch(e: any){
+                    this.#currentMessage = "Insufficient Clicks!";
+                    this.#messageColour = "red";
+                    this.#updateUI();
+                    setTimeout(() => {
+                        this.#currentMessage = "";
+                        this.#updateUI();
+                    },1000);
+                }
+            });
+            buildingSection.appendChild(button);
+        });
     }
 }

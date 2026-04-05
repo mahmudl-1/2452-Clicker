@@ -1,5 +1,5 @@
 import "./style.css"
-import { GameController } from "./controller/GameController";
+import { PlayerController } from "./controller/PlayerController";
 //Changes since the feedback Phase 1
 //Upgrades return a value of clickdamage which the game
 //sets upon itself
@@ -10,7 +10,7 @@ import { GameController } from "./controller/GameController";
 //entry point
 function main(){
     //3. initializing the controller
-    new GameController();
+    new PlayerController();
 }
 
 

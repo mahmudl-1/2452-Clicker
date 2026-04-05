@@ -1,6 +1,6 @@
 create table if not exists Player(
     username varchar(255) unique not null,
-    password varchar(255) unique not null
+    password varchar(255) not null
 );
 
 create table if not exists Game(

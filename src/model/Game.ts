@@ -1,6 +1,10 @@
+import { AdvanceBuilding } from "./AdvancedBuilding";
 import { assert } from "./Assertions";
+import { BasicBuilding } from "./BasicBuilding";
+import type { Building } from "./Building";
 import { NotSuffecientClicksException } from "./Exceptions/NotSuffecientClicksException";
 import type { Listener } from "./Listeners";
+import type { Purchasable } from "./Purchasable";
 import type { Upgrade } from "./Upgrade";
 import { UpgradeADD } from "./UpgradeADD";
 import { UpgradeMULT } from "./UpgradeMULT";
@@ -8,22 +12,40 @@ import { UpgradeMULT } from "./UpgradeMULT";
     the click damage and all the upgrades and buildings purchasable
     It is also responsible for managing the listener pattern notifying the view.*/
 export class Game{
+    #id: number; // phase 2
     #totalClicks: number;
     #clickDamage: number;
-    #upgradeADD: UpgradeADD;
-    #upgradeMULT: UpgradeMULT;
+    #upgradeADD: UpgradeADD[];
+    #upgradeMULT: UpgradeMULT[];
+    #basicBuilding: BasicBuilding;
+    #advancedBuilding: AdvanceBuilding;
     #gameListeners: Listener[];
     //updated for storing each upgrade in the inventory
-    #purchasedUpgrades: Upgrade[];
+    #inventory: Purchasable[];
 
     constructor(){
+        this.#id = 0;//phase 2
         this.#totalClicks = 0;
         this.#clickDamage = 1;
-        this.#upgradeADD = new UpgradeADD("Rolling pin", 20, 10);
-        this.#upgradeMULT = new UpgradeMULT("Candy worker", 100, 2);
+        this.#upgradeADD = new Array(new UpgradeADD("Rolling pin", 50, 10,this,"Ancient bakers swore by this. It might look simple, but it's the secret to perfectly thin, crispy candies. +10 clicks"));
+        this.#upgradeMULT = new Array(new UpgradeMULT("Candy worker", 200, 2,this,"Trained in the art of rapid confectionery, this worker doubles your manual effort with professional precision."));
+        this.#basicBuilding = new BasicBuilding("Candy store","The bells are chiming and the shelves are stocked! A constant stream of customers means a steady flow of clicks every second. +1 autoClick", 300, this);
+        this.#advancedBuilding = new AdvanceBuilding("Candy Factory","A massive industrial complex dedicated to high-speed confectionery production. Steam-powered vats and conveyor belts ensure the sugar never stops moving. +10 autoClicks", 500, this);
         this.#gameListeners = new Array<Listener>();
-        this.#purchasedUpgrades = new Array<Upgrade>();
+        this.#inventory = new Array<Purchasable>();
         this.#checkGame();
+    }
+
+    get basicBuilding(): Building{
+        return this.#basicBuilding;
+    }
+
+    get advancedBuilding(): Building{
+        return this.#advancedBuilding;
+    }
+
+    get Inventory(): Purchasable[]{
+        return this.#inventory;
     }
 
     get clickDamage(): number{
@@ -55,16 +77,12 @@ export class Game{
         this.#notifyAll();
     }
 
-    get upgradeADD(): Upgrade{
+    get upgradeADD(): Upgrade[]{
         return this.#upgradeADD;
     }
 
-    get upgradeMULT(): Upgrade{
+    get upgradeMULT(): Upgrade[]{
         return this.#upgradeMULT;
-    }
-
-    get purchasedUpgrades(): Upgrade[]{
-        return this.#purchasedUpgrades;
     }
 
     /*This method takes an upgrade as an input and uses it to change the total clicks
@@ -72,16 +90,20 @@ export class Game{
         this method can apply the upgrade otherwise does nothing.
         After applying the upgrade it notifies all listeners(view) that change has taken place
         input: Upgrade, the upgrade that was clicked */
-    buyUpgrade(upgrade: Upgrade): void{
-        assert(upgrade !== null, "Upgrade cannot be null");
+    buyPurchasable(purchasable: Purchasable): void{
         let applied = false;
-        if(this.#totalClicks >= upgrade.cost){
-            this.#clickDamage = upgrade.apply(this);
-            this.#totalClicks -= upgrade.cost;
-            //Updated to register every upgrade in the inventory
-            this.#purchasedUpgrades.push(upgrade);
-            applied = true;
-            
+        if(this.#totalClicks >= purchasable.cost ){
+            if(purchasable instanceof UpgradeADD || purchasable instanceof UpgradeMULT){
+                this.#clickDamage = purchasable.apply(this);
+                this.#totalClicks -= purchasable.cost;
+                //Updated to register every upgrade in the inventory
+                this.#inventory.push(purchasable);
+                applied = true;
+            }else{
+                this.#inventory.push(purchasable);
+                this.#totalClicks -= purchasable.cost;
+                applied = true;
+            }
         }else{
             throw new NotSuffecientClicksException();
         }
@@ -89,6 +111,15 @@ export class Game{
         if(applied){
             this.#notifyAll();
         }
+    }
+
+    autoClickTick(){
+        this.#inventory.forEach((inven) => {
+            if(inven instanceof BasicBuilding|| inven instanceof AdvanceBuilding){
+                this.#totalClicks += inven.produceClicks();
+            }
+        });
+        this.#notifyAll();
     }
 
     get TotalClicks(): number{

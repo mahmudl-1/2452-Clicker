@@ -1,5 +1,6 @@
-import { NotSuffecientClicksException } from "../model/Exceptions/NotSuffecientClicksException";
+import type { Building } from "../model/Building";
 import { Game } from "../model/Game";
+import type { Purchasable } from "../model/Purchasable";
 import type { Upgrade } from "../model/Upgrade";
 import { GameView } from "../view/GameView";
 
@@ -10,9 +11,12 @@ export class GameController{
 
     //4. initialize internal state.
     //5. initialize the view for the internal state (the game)
-    constructor(){
-        this.#game = new Game();
+    constructor(game: Game){
+        this.#game = game;
         this.#gameView = new GameView(this.#game, this);
+        setInterval(() => {
+            this.#game.autoClickTick();
+        },1000);
     }
 
     //11. Button clicked so letting domain know to change
@@ -23,18 +27,19 @@ export class GameController{
 
     //getter for upgrades
     getUpgrades(): Upgrade[]{
-        const upgrades: Upgrade[] = [this.#game.upgradeADD, this.#game.upgradeMULT];
+        const upgrades: Upgrade[] = [];
+        this.#game.upgradeADD.forEach((up) => {upgrades.push(up)});
+        this.#game.upgradeMULT.forEach((upg) => {upgrades.push(upg)});
         return upgrades;
     }
 
+    getBuildings(): Building[]{
+        const buildings: Building[] = [this.#game.basicBuilding, this.#game.advancedBuilding];
+        return buildings;
+    }
+
     //buying upgrade
-    upgradeClick(up: Upgrade): void{
-        try{
-            this.#game.buyUpgrade(up);
-        }catch(e: any){
-            if(e instanceof NotSuffecientClicksException){
-                throw new NotSuffecientClicksException();
-            }
-        }
+    purchasableClicked(purchasable: Purchasable): void{
+        this.#game.buyPurchasable(purchasable);
     }
 }

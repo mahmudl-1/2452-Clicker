@@ -71,7 +71,6 @@ flowchart
         UpdateDisplay-.Increased total Clicks by Click damage.->DisplayMain
         
         DisplayMain==Clicked on a upgrade text==>UpdateDisplay
-        UpdateDisplay-.Already Purchased before.->DisplayMain
         UpdateDisplay-.Not sufficient clicks.->DisplayMain
     end
 ```
