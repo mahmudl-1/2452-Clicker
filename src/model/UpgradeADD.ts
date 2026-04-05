@@ -1,4 +1,6 @@
+import { query } from "@electric-sql/pglite/template";
 import { assert } from "./Assertions";
+import { db } from "./connections";
 import type { Game } from "./Game";
 import type { Upgrade } from "./Upgrade";
 
@@ -19,6 +21,21 @@ export class UpgradeADD implements Upgrade{
         this.game = game;
         this.description = description;
         this.#checkUpgradeAdd();
+    }
+
+    get effect(): number{
+        return this.#effect;
+    }
+
+    game_id(): number{
+        return this.game.id;
+    }
+
+    static async saveUpgradeADD(upgradeADD: UpgradeADD): Promise<UpgradeADD>{
+        let results = await db().query("insert into upgradeadd(name, description, cost, effect, game_id) values($1,$2,$3, $4, $5)",
+            [upgradeADD.name,upgradeADD.description,upgradeADD.cost,upgradeADD.effect, upgradeADD.game_id()]
+        );
+        return upgradeADD;
     }
 
     //pre,post condition check

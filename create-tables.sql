@@ -1,3 +1,10 @@
+drop table BasicBuilding;
+drop table AdvancedBuilding; 
+drop table UpgradeADD;
+drop table upgrademult;
+drop table game;
+drop table Player;
+
 create table if not exists Player(
     username varchar(255) unique not null,
     password varchar(255) not null
@@ -7,7 +14,7 @@ create table if not exists Game(
     id serial unique not null,
     totalClicks integer not null,
     clickDamage integer not null,
-    player_username varchar(255) unique not null,
+    player_username varchar(255) not null,
     foreign key (player_username) references Player(username) on delete Cascade
 );
 

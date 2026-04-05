@@ -1,12 +1,15 @@
 import { assert } from "./Assertions";
+import { db } from "./connections";
 import { InvalidPasswordException } from "./Exceptions/InvalidPasswordException";
 import { InvalidUsernameException } from "./Exceptions/InvalidUsernameException";
 import { Game } from "./Game";
+import type { Listener } from "./Listeners";
 
 export class Player{
     readonly #username: string;
     #password: string;
     #game: Game;
+    #playerListeners: Listener[];
 
     constructor(username: string, password: string){
         if(username.length == 0){
@@ -17,8 +20,47 @@ export class Player{
         }
         this.#username = username;
         this.#password = password;
-        this.#game = new Game();
+        this.#game = new Game(this);
+        this.#playerListeners = new Array<Listener>();
+        this.#notifyAll();
         this.#checkPlayer();
+    }
+
+    static async getAllPlayers(): Promise<Array<Player>>{
+        const allPlayers = new Array<Player>();
+
+        let results = await db()
+            .query<{name: string, password: string}>("select * from player");
+
+        results.rows.forEach((row) =>{
+            allPlayers.push(new Player(row.name, row.password));
+        });
+
+        return allPlayers;
+    }   
+
+    static async savePlayer(player: Player): Promise<Player>{
+        let results = await db().query("insert into player(username, password) values($1,$2)",
+            [player.username, player.password]
+        );
+        return player;
+    }
+
+    validatePass(pass: string): boolean{
+        return this.#password === pass;
+    }
+
+    registerListener(listener: Listener): void{
+        assert(listener != null, "Listener cannot be null");
+        this.#playerListeners.push(listener);
+    }
+
+    #notifyAll():void{
+        this.#playerListeners.forEach(l => l.notify());
+    }
+
+    forcedNotify(){
+        this.#notifyAll();
     }
 
     #checkPlayer(){
@@ -32,5 +74,9 @@ export class Player{
 
     get username(): string{
         return this.#username;
+    }
+
+    get password(): string{
+        return this.#password;
     }
 }

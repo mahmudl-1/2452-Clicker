@@ -1,5 +1,6 @@
 import { assert } from "./Assertions";
 import type { Building } from "./Building";
+import { db } from "./connections";
 import type { Game } from "./Game";
 
 export class AdvanceBuilding implements Building{
@@ -16,6 +17,17 @@ export class AdvanceBuilding implements Building{
         this.game = game; 
         this.clickPerSecond = 10;
         this.#checkABuilding();
+    }
+
+    game_id():number{
+        return this.game.id;
+    }
+
+    static async saveAdvanceBuilding(advanceBuilding: AdvanceBuilding): Promise<AdvanceBuilding>{
+        let results = await db().query("insert into advancedbuilding(name, description, cost, clicksPerSecond, game_id)  values($1,$2,$3,$4,$5)",
+            [advanceBuilding.name,advanceBuilding.description,advanceBuilding.cost,advanceBuilding.clickPerSecond,advanceBuilding.game_id()]
+        );
+        return advanceBuilding;
     }
 
     produceClicks(): number {

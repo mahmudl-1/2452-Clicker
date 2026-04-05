@@ -1,4 +1,5 @@
 import { assert } from "./Assertions";
+import { db } from "./connections";
 import type { Game } from "./Game";
 import type { Upgrade } from "./Upgrade";
 
@@ -18,6 +19,33 @@ export class UpgradeMULT implements Upgrade{
         this.game = game;
         this.description = description;
         this.#checkUpgradeMult();
+    }
+
+    get multFactor(): number{
+        return this.#multFactor;
+    }
+
+    game_id(): number{
+        return this.game.id;
+    }
+    
+   static async saveUpgradeMULT(upgradeMult: UpgradeMULT): Promise<UpgradeMULT> {
+        const query = `
+            INSERT INTO upgrademult (name, description, cost, multFactor, game_id) 
+            VALUES ($1, $2, $3, $4, $5)
+        `;
+    
+        const values = [
+            upgradeMult.name, 
+            upgradeMult.description, 
+            upgradeMult.cost, 
+            upgradeMult.multFactor, 
+            upgradeMult.game_id()
+        ];
+
+        await db().query(query, values);
+    
+        return upgradeMult;
     }
     
     //pre,post condition

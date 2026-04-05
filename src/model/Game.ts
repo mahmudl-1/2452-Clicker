@@ -2,8 +2,10 @@ import { AdvanceBuilding } from "./AdvancedBuilding";
 import { assert } from "./Assertions";
 import { BasicBuilding } from "./BasicBuilding";
 import type { Building } from "./Building";
+import { db } from "./connections";
 import { NotSuffecientClicksException } from "./Exceptions/NotSuffecientClicksException";
 import type { Listener } from "./Listeners";
+import type { Player } from "./Player";
 import type { Purchasable } from "./Purchasable";
 import type { Upgrade } from "./Upgrade";
 import { UpgradeADD } from "./UpgradeADD";
@@ -22,18 +24,42 @@ export class Game{
     #gameListeners: Listener[];
     //updated for storing each upgrade in the inventory
     #inventory: Purchasable[];
+    #player: Player;
 
-    constructor(){
+    constructor(player: Player){
         this.#id = 0;//phase 2
         this.#totalClicks = 0;
         this.#clickDamage = 1;
-        this.#upgradeADD = new Array(new UpgradeADD("Rolling pin", 50, 10,this,"Ancient bakers swore by this. It might look simple, but it's the secret to perfectly thin, crispy candies. +10 clicks"));
+        this.#upgradeADD = new Array(new UpgradeADD("Rolling pin", 50, 10,this,"Ancient bakers swore by this. It might look simple, but its the secret to perfectly thin, crispy candies. +10 clicks"));
         this.#upgradeMULT = new Array(new UpgradeMULT("Candy worker", 200, 2,this,"Trained in the art of rapid confectionery, this worker doubles your manual effort with professional precision."));
         this.#basicBuilding = new BasicBuilding("Candy store","The bells are chiming and the shelves are stocked! A constant stream of customers means a steady flow of clicks every second. +1 autoClick", 300, this);
         this.#advancedBuilding = new AdvanceBuilding("Candy Factory","A massive industrial complex dedicated to high-speed confectionery production. Steam-powered vats and conveyor belts ensure the sugar never stops moving. +10 autoClicks", 500, this);
         this.#gameListeners = new Array<Listener>();
         this.#inventory = new Array<Purchasable>();
+        this.#player = player;
         this.#checkGame();
+    }
+
+    playerName(): string{
+        return this.#player.username;
+    }
+
+    set id(num: number){
+        this.#id = num;
+    }
+
+    get id(): number{
+        return this.#id;
+    }
+    static async saveGame(game: Game): Promise<Game>{
+        let results = await db().query<{id:number}>("insert into game(id, totalClicks, clickDamage, player_username) values(default, $1, $2,$3) returning id",
+            [game.TotalClicks,game.clickDamage,game.playerName()]
+        );
+        if (results.rows.length > 0) {
+            // Grab the 'id' from the first row returned by RETURNING id
+            game.id = results.rows[0].id;
+        }
+        return game;
     }
 
     get basicBuilding(): Building{
