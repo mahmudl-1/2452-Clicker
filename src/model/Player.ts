@@ -5,6 +5,33 @@ import { InvalidUsernameException } from "./Exceptions/InvalidUsernameException"
 import { Game } from "./Game";
 import type { Listener } from "./Listeners";
 
+const encoder = new TextEncoder();
+
+async function hashPassword(password: string, salt: string): Promise<string> {
+    const passwordKey = await window.crypto.subtle.importKey(
+        "raw",
+        encoder.encode(password),
+        { name: "PBKDF2" },
+        false,
+        ["deriveBits", "deriveKey"]
+    );
+
+    const hashBuffer = await window.crypto.subtle.deriveBits(
+        {
+            name: "PBKDF2",
+            salt: encoder.encode(salt),
+            iterations: 10000,
+            hash: "SHA-256",
+        },
+        passwordKey,
+        256
+    );
+
+    return Array.from(new Uint8Array(hashBuffer))
+        .map(b => b.toString(16).padStart(2, "0"))
+        .join("");
+}
+
 export class Player{
     readonly #username: string;
     #password: string;
@@ -26,28 +53,48 @@ export class Player{
         this.#checkPlayer();
     }
 
+    async loadSavedGame(){
+        this.#game = await Game.loadGame(this);
+    }
+
     static async getAllPlayers(): Promise<Array<Player>>{
         const allPlayers = new Array<Player>();
 
         let results = await db()
-            .query<{name: string, password: string}>("select * from player");
+            .query<{username: string, password: string}>("select * from player");
 
         results.rows.forEach((row) =>{
-            allPlayers.push(new Player(row.name, row.password));
+            allPlayers.push(new Player(row.username, row.password));
         });
 
         return allPlayers;
     }   
 
     static async savePlayer(player: Player): Promise<Player>{
-        let results = await db().query("insert into player(username, password) values($1,$2)",
-            [player.username, player.password]
+        const salt = window.crypto.randomUUID();
+        const hashedPassword = await hashPassword(player.password, salt);
+
+        let results = await db().query("insert into player(username, password, salt) values($1,$2,$3)",
+            [player.username, hashedPassword, salt]
         );
         return player;
     }
 
-    validatePass(pass: string): boolean{
-        return this.#password === pass;
+    async validatePass(pass: string):Promise<boolean>{
+        let valid = false;
+        const results = await db().query<{password: string, salt: string}>(
+            "select password, salt from player where username = $1", [this.#username]
+        );
+
+        if(results.rows.length!==0){
+            const storedHash = results.rows[0].password;
+            const storedSalt = results.rows[0].salt;
+
+            const inputHash = await hashPassword(pass, storedSalt);
+
+            if(inputHash === storedHash) valid = true;
+        }
+        return valid;
     }
 
     registerListener(listener: Listener): void{

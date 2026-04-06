@@ -34,7 +34,7 @@ export class GameController{
     }
 
     getBuildings(): Building[]{
-        const buildings: Building[] = [this.#game.basicBuilding, this.#game.advancedBuilding];
+        const buildings: Building[] = [this.#game.basicBuilding[0], this.#game.advancedBuilding[0]];
         return buildings;
     }
 

@@ -10,12 +10,12 @@ export class BasicBuilding implements Building{
     readonly game: Game;
     readonly clickPerSecond: number;
 
-    constructor(name: string, description:string, cost:number,game:Game){
+    constructor(name: string, description:string, cost:number,game:Game, clickPerSecond: number){
         this.name = name;
         this.description = description;
         this.cost = cost;
         this.game = game;
-        this.clickPerSecond = 1;
+        this.clickPerSecond = clickPerSecond;
         this.#checkBBuilding();
     }
 

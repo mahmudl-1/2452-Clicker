@@ -19,8 +19,8 @@ export class Game{
     #clickDamage: number;
     #upgradeADD: UpgradeADD[];
     #upgradeMULT: UpgradeMULT[];
-    #basicBuilding: BasicBuilding;
-    #advancedBuilding: AdvanceBuilding;
+    #basicBuilding: BasicBuilding[];
+    #advancedBuilding: AdvanceBuilding[];
     #gameListeners: Listener[];
     //updated for storing each upgrade in the inventory
     #inventory: Purchasable[];
@@ -30,14 +30,47 @@ export class Game{
         this.#id = 0;//phase 2
         this.#totalClicks = 0;
         this.#clickDamage = 1;
-        this.#upgradeADD = new Array(new UpgradeADD("Rolling pin", 50, 10,this,"Ancient bakers swore by this. It might look simple, but its the secret to perfectly thin, crispy candies. +10 clicks"));
-        this.#upgradeMULT = new Array(new UpgradeMULT("Candy worker", 200, 2,this,"Trained in the art of rapid confectionery, this worker doubles your manual effort with professional precision."));
-        this.#basicBuilding = new BasicBuilding("Candy store","The bells are chiming and the shelves are stocked! A constant stream of customers means a steady flow of clicks every second. +1 autoClick", 300, this);
-        this.#advancedBuilding = new AdvanceBuilding("Candy Factory","A massive industrial complex dedicated to high-speed confectionery production. Steam-powered vats and conveyor belts ensure the sugar never stops moving. +10 autoClicks", 500, this);
+        this.#upgradeADD = [];
+        this.#upgradeMULT = [];
+        this.#basicBuilding = [];
+        this.#advancedBuilding = [];
         this.#gameListeners = new Array<Listener>();
         this.#inventory = new Array<Purchasable>();
         this.#player = player;
         this.#checkGame();
+    }
+
+    static async getStoreCatalog(game: Game): Promise<Purchasable[]>{
+        const results = await db().query<{
+            name: string,
+            item_type: string,  
+            description: string, 
+            cost: number, 
+            effect_value: number 
+        }>("select *from catalog");
+
+        const storeItems: Purchasable[] = [];
+
+        results.rows.forEach(row => {
+            if(row.item_type === "UpgradeADD"){
+                storeItems.push(new UpgradeADD(row.name, row.cost, row.effect_value, game,row.description));
+            }else if(row.item_type === "UpgradeMULT"){
+                storeItems.push(new UpgradeMULT(row.name, row.cost, row.effect_value, game,row.description));
+            }else if(row.item_type === "BasicBuilding"){
+                storeItems.push(new BasicBuilding(row.name,row.description,row.cost,game,row.effect_value));
+            }else if(row.item_type === "AdvanceBuilding"){
+                storeItems.push(new AdvanceBuilding(row.name,row.description,row.cost,game,row.effect_value));
+            }
+        });
+        return storeItems;
+    }
+
+    set TotalClicks(num: number){
+        this.#totalClicks = num;
+    }
+
+    set clickDamage(dmg: number){
+        this.#clickDamage = dmg;
     }
 
     playerName(): string{
@@ -51,6 +84,21 @@ export class Game{
     get id(): number{
         return this.#id;
     }
+
+    populateStore(catalog: Purchasable[]){
+        catalog.forEach((pur) =>{
+            if(pur instanceof UpgradeADD){
+                this.upgradeADD.push(pur);
+            }else if(pur instanceof UpgradeMULT){
+                this.upgradeMULT.push(pur);
+            }else if(pur instanceof BasicBuilding){
+                this.#basicBuilding.push(pur);
+            }else if(pur instanceof AdvanceBuilding){
+                this.#advancedBuilding.push(pur);
+            }
+        });
+    }
+
     static async saveGame(game: Game): Promise<Game>{
         let results = await db().query<{id:number}>("insert into game(id, totalClicks, clickDamage, player_username) values(default, $1, $2,$3) returning id",
             [game.TotalClicks,game.clickDamage,game.playerName()]
@@ -62,11 +110,28 @@ export class Game{
         return game;
     }
 
-    get basicBuilding(): Building{
+    static async loadGame(player: Player): Promise<Game>{
+        let username = player.username;
+        const results = await db().query<{ id: number, totalclicks: number, clickdamage: number }>("select *from game where player_username = $1",
+            [username]
+        );
+
+        const loadedGame = new Game(player);
+
+        if(results.rows.length>0){
+            const row = results.rows[0];
+            loadedGame.id = row.id;
+            loadedGame.TotalClicks = row.totalclicks;
+            loadedGame.clickDamage = row.clickdamage;
+        }
+        return loadedGame;
+    }
+
+    get basicBuilding(): Building[]{
         return this.#basicBuilding;
     }
 
-    get advancedBuilding(): Building{
+    get advancedBuilding(): Building[]{
         return this.#advancedBuilding;
     }
 

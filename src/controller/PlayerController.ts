@@ -17,8 +17,10 @@ export class PlayerController{
     }
 
     //create new account
-    addPlayer(name: string, pass: string){
+    async addPlayer(name: string, pass: string){
         this.#player = new Player(name,pass);
+        const catalog = await Game.getStoreCatalog(this.#player.game);
+        this.#player.game.populateStore(catalog);
         this.#save();
         this.#playerView = undefined;
         this.#gameController = new GameController(this.#player.game);
@@ -46,26 +48,42 @@ export class PlayerController{
         await AdvanceBuilding.saveAdvanceBuilding(game.advancedBuilding);
     }
 }
-    //existing
-    existingPlayer(name: string, pass: string){
-        Player.getAllPlayers().then((allPlayers) => {
-            const player = allPlayers.find(p => p.username === name && p.validatePass(pass))
-            if (player) {
+    //existing log in
+    async existingPlayer(name: string, pass: string){
+        const allPlayers = await Player.getAllPlayers();
+        const player = allPlayers.find(p => p.username === name);
+    
+        if (player) {
+            const isValid = await player.validatePass(pass);
+            if (isValid) {
                 this.#player = player;
-            
+                await this.#player.loadSavedGame();
+                const catalog = await Game.getStoreCatalog(this.#player.game);
+                this.#player.game.populateStore(catalog);
                 if (this.#playerView) {
                     this.#player.registerListener(this.#playerView);
                     this.#player.forcedNotify();
                 }
-            
+    
                 this.#gameController = new GameController(this.#player.game);
             } else {
-                console.error("Login failed: Invalid username or password.");
+                throw new wrongPassword();
             }
-       });
+        }else{
+            throw new noAccountExist();
+        }
     }
 
     get player(): Player{
         return this.#player!;
     }
+
+}
+
+export class noAccountExist extends Error{
+
+}
+
+export class wrongPassword extends Error{
+
 }

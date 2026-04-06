@@ -1,4 +1,4 @@
-import type { PlayerController } from "../controller/PlayerController";
+import { noAccountExist, wrongPassword, type PlayerController } from "../controller/PlayerController";
 import { InvalidPasswordException } from "../model/Exceptions/InvalidPasswordException";
 import { InvalidUsernameException } from "../model/Exceptions/InvalidUsernameException";
 import type { Listener } from "../model/Listeners";
@@ -37,7 +37,11 @@ export class PlayerView implements Listener{
 
                 <br>
 
-                <button id="reg-btn">Create Account & Start</button>
+                <div style="display: flex; justify-content: center; gap: 10px;">
+                    <button id="login-btn">Log In</button>
+                    <button id="reg-btn">Create Account</button>
+                </div>
+
                 <p id="error-msg" style="color: red; margin-top: 10px;"></p>
             </div>
         `;
@@ -45,10 +49,12 @@ export class PlayerView implements Listener{
         const userField = document.querySelector<HTMLInputElement>("#username")!;
         const passField = document.querySelector<HTMLInputElement>("#password")!;
         const regButton = document.querySelector<HTMLButtonElement>("#reg-btn")!;
+        const loginButton = document.querySelector<HTMLButtonElement>("#login-btn")!;
         const toggleButton = document.querySelector<HTMLElement>("#togglePassword")!;
             
         const handleSubmit = () => {
             try {
+                this.#showError("");
                 this.#controller.addPlayer(userField.value, passField.value);
                 this.#controller.player.registerListener(this);
             } catch (e: any) {
@@ -62,23 +68,34 @@ export class PlayerView implements Listener{
             }
         };
 
-        regButton.addEventListener("click", handleSubmit);
+        const handleLogin = async () => {
+            this.#showError("");
 
-        const enterKeyHandler = (event: KeyboardEvent)=>{
-            if(event.key === "Enter"){
-                handleSubmit();
+            if(userField.value.trim() === "" || passField.value.trim() === ""){
+                this.#showError("Please enter both a username and password.");
+            }else if(passField.value.length <= 5){
+                this.#showError("The password entered is not long enough.");
+            }else{
+                try{
+                   await this.#controller.existingPlayer(userField.value, passField.value);
+            
+                }catch(e: any){
+                    if(e instanceof wrongPassword){
+                        this.#showError("The password entered is wrong.");
+                    }else if(e instanceof noAccountExist){
+                        this.#showError("No account exist of the given username.");
+                    }
+                }
             }
         };
-        
-        userField.addEventListener("keydown", enterKeyHandler);
-        passField.addEventListener("keydown", enterKeyHandler);
 
-        toggleButton.addEventListener("click", () =>{
+        regButton.addEventListener("click", handleSubmit);
+        loginButton.addEventListener("click", handleLogin);
+
+        toggleButton.addEventListener("click", () => {
             const isPassword = passField.getAttribute("type") === "password";
             passField.setAttribute("type", isPassword ? "text" : "password");
-            toggleButton.textContent = isPassword ? "👁" : "👁";
         });
-
     }
 
     #showError(message: string) {
