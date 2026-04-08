@@ -27,7 +27,7 @@ restraints have been added on certain variables.
 classDiagram
     class Player{
         -~username: string
-        -~password: string
+        -password: string
         -game: Game
         +validatePass(pass: string): Promise<boolean>
         %%listener pattern

@@ -41,7 +41,7 @@ export class Player{
     #playerListeners: Listener[];
 
     constructor(username: string, password: string){
-        if(username.length == 0){
+        if(username.length === 0){
             throw new InvalidUsernameException();
         }
         if(password.length <= 5){
@@ -85,7 +85,7 @@ export class Player{
         return player;
     }
 
-    //Takes a input pass as input and hashes it and checks it with the stored hash to validate
+    //Takes a input pass as input and hashes it and checks it with the stored hash to check if they are equal
     async validatePass(pass: string):Promise<boolean>{
         let valid = false;
         const results = await db().query<{password: string, salt: string}>(

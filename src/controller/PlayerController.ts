@@ -49,16 +49,19 @@ export class PlayerController{
     //saves the game by removing the old inventory then saving the current one
     async #save() {
         const game = this.#player!.game;
+        //checking if a new save or existing save
         if(game.id === 0){
             await Player.savePlayer(this.#player!);
         }
         await Game.saveGame(game);
 
+        //deleting the old inventory
         await db().query("delete from basicbuilding where game_id = $1", [game.id]);
         await db().query("delete from advancedbuilding where game_id = $1", [game.id]);
         await db().query("delete from upgradeadd where game_id = $1", [game.id]);
         await db().query("delete from upgrademult where game_id = $1", [game.id]);
 
+        //saving the new inventory
         for (const item of game.Inventory) {
             if (item instanceof BasicBuilding) {
                 await BasicBuilding.saveBasicBuilding(item);
@@ -75,14 +78,9 @@ export class PlayerController{
 
     //existing log in
     async existingPlayer(name: string, pass: string){
+        const checkUsernamePass = new Player(name, pass);
         const allPlayers = await Player.getAllPlayers();
-        const player = allPlayers.find(p => p.username === name);
-
-        if(pass.length <= 5){
-            throw new InvalidPasswordException();
-        }else if(name.trim() === "" || pass.trim() === ""){
-            throw new InvalidUsernameException();
-        }
+        const player = allPlayers.find(p => p.username === name); //checking if the plaayer exists
     
         if (player) { //seeing if account exist
             const isValid = await player.validatePass(pass); //validating password
@@ -90,16 +88,16 @@ export class PlayerController{
                 this.#player = player;
                 await player.loadSavedGame(); //loading in the saved state of the player
 
-                const catalog = await Game.getStoreCatalog(this.#player.game);
+                const catalog = await Game.getStoreCatalog(this.#player.game); //loading in game initial state
                 this.#player.game.populateStore(catalog);
 
                 if (this.#playerView) { //after loading the player connecting the player view as listener and forcefully notifying to clear view
                     this.#player.registerListener(this.#playerView);
-                    this.#player.forcedNotify();
+                    this.#player.forcedNotify(); //forcefully telling the view to clear itself
                 }
     
                 this.#gameController = new GameController(this.#player.game); //loading game view
-                this.#startAutoSave();
+                this.#startAutoSave(); //autosaves every 10 sec
             } else {
                 throw new wrongPassword();
             }

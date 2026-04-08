@@ -135,6 +135,7 @@ export class Game{
             loadedGame.TotalClicks = row.totalclicks;
             loadedGame.clickDamage = row.clickdamage;
 
+            //for the autoclicking to resume
             (await AdvanceBuilding.loadAdvanceBuildings(loadedGame)).forEach((ab) => loadedGame.Inventory.push(ab));
             (await BasicBuilding.loadBasicBuildings(loadedGame)).forEach((bb) => {loadedGame.Inventory.push(bb)});
             (await UpgradeADD.loadUpgradeADDs(loadedGame)).forEach((ua) => {loadedGame.Inventory.push(ua)});

@@ -6,6 +6,10 @@ date: Winter 2026
 
 # Running
 You can start my app with `npm` and `npx`:
+You have to create an account with new username and password if first time 
+playing. Then start clicking.
+The game has a autosave system which auto saves every ~10sec.
+The Repl is below everything at the bottom of the screen copied from franklin.
 
 ```bash
 npm install
@@ -25,6 +29,6 @@ Candy Clicker has a candy which the user can click to gain click points. Which
 they can spend Later on buying Upgrades for their clicking power or buying buildings
 which will click for them. They have to create an account with username and password to save
 their data and get back to playing to the current step when logging back in.
-(not yet implemented.).
+.
 
 
