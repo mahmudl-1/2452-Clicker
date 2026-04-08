@@ -14,6 +14,8 @@ export class GameController{
     constructor(game: Game){
         this.#game = game;
         this.#gameView = new GameView(this.#game, this);
+
+        //autoclicks the candy
         setInterval(() => {
             this.#game.autoClickTick();
         },1000);
@@ -33,6 +35,7 @@ export class GameController{
         return upgrades;
     }
 
+    //getter for buildings
     getBuildings(): Building[]{
         const buildings: Building[] = [this.#game.basicBuilding[0], this.#game.advancedBuilding[0]];
         return buildings;

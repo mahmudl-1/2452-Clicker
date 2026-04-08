@@ -1,11 +1,12 @@
-drop table BasicBuilding;
-drop table AdvancedBuilding; 
-drop table UpgradeADD;
-drop table upgrademult;
-drop table game;
-drop table Player;
-drop table catalog;
+--drop table BasicBuilding;
+--drop table AdvancedBuilding; 
+--drop table UpgradeADD;
+--drop table upgrademult;
+--drop table game;
+--drop table Player;
+--drop table catalog;
 
+--updated and added the salt for hashing
 create table if not exists Player(
     username varchar(255) unique not null,
     password varchar(255) not null,
@@ -20,28 +21,27 @@ create table if not exists Game(
     foreign key (player_username) references Player(username) on delete Cascade
 );
 
+--name uniqueness removed for using as array for inventory for the PURCHASABLES
 create table if not exists UpgradeADD(
-    name varchar(255) unique not null,
+    name varchar(255) not null,
     description varchar(255),
     cost integer not null,
     effect integer not null,
     game_id integer not null,
-    --when the game is deleted upgradeadd will be deleted too
     foreign key(game_id) references Game(id) on delete Cascade
 );
 
 create table if not exists UpgradeMULT(
-    name varchar(255) unique not null,
+    name varchar(255) not null,
     description varchar(255),
     cost integer not null,
     multFactor integer not null,
     game_id integer not null,
-    --when the game is deleted upgrademult will be deleted too
     foreign key(game_id) references Game(id) on delete Cascade
 );
 
 create table if not exists BasicBuilding(
-    name varchar(255) unique not null,
+    name varchar(255) not null,
     description varchar(255),
     cost integer not null,
     clicksPerSecond integer not null,
@@ -50,7 +50,7 @@ create table if not exists BasicBuilding(
 );
 
 create table if not exists AdvancedBuilding(
-    name varchar(255) unique not null,
+    name varchar(255) not null,
     description varchar(255),
     cost integer not null,
     clicksPerSecond integer not null,
@@ -58,6 +58,7 @@ create table if not exists AdvancedBuilding(
     foreign key(game_id) references Game(id) on delete Cascade
 );
 
+--A predefined catalog that holds all the upgrades
 create table if not exists catalog(
     name varchar(255) unique not null,
     item_type varchar(255),
@@ -67,10 +68,18 @@ create table if not exists catalog(
 );
 
 insert into catalog (name, item_type, description, cost, effect_value) values
-('Rolling pin', 'UpgradeADD', 'Ancient bakers swore by this. It might look simple, but its the secret to perfectly thin, crispy candies. +10 clicks', 50, 10),
-('Candy worker', 'UpgradeMULT', 'Trained in the art of rapid confectionery, this worker doubles your manual effort with professional precision.', 200, 2),
-('Candy store', 'BasicBuilding', 'The bells are chiming and the shelves are stocked! A constant stream of customers means a steady flow of clicks every second. +1 autoClick', 300, 1),
-('Candy Factory', 'AdvanceBuilding', 'A massive industrial complex dedicated to high-speed confectionery production. Steam-powered vats and conveyor belts ensure the sugar never stops moving. +10 autoClicks', 500, 10) 
+('Rolling pin', 'UpgradeADD', 'Ancient bakers swore by this. It might look simple, but its the secret to perfectly thin, crispy candies. +10 clicks', 10, 10),
+('Candy worker', 'UpgradeMULT', 'Trained in the art of rapid confectionery, this worker doubles your manual effort with professional precision.', 20, 2),
+('Candy store', 'BasicBuilding', 'The bells are chiming and the shelves are stocked! A constant stream of customers means a steady flow of clicks every second. +1 autoClick', 30, 1),
+('Candy Factory', 'AdvanceBuilding', 'A massive industrial complex dedicated to high-speed confectionery production. Steam-powered vats and conveyor belts ensure the sugar never stops moving. +10 autoClicks', 50, 10) 
 on conflict(name) do nothing;
 
 
+
+-- for easier access to repl just copy paste removing the comment -- bars
+--select * from player;
+--select * from game;
+--select * from upgradeadd;
+--select * from upgrademult;
+--select * from basicbuilding;
+--select * from advancedbuilding;

@@ -29,9 +29,11 @@ classDiagram
         -~username: string
         -~password: string
         -game: Game
+        +validatePass(pass: string): Promise<boolean>
         %%listener pattern
-        +createGameAccount(): void
-        +login(): void
+        %%+createGameAccount(): void
+        %%+login(): void
+        %%loaders,savers,getters,setters
     }
     note for Player "Invariant Properties
                      *username.length > 0
@@ -43,8 +45,8 @@ classDiagram
         - clickDamage: number
         - upgradeADD: UpgradeADD[]
         - upgradeMULT: UpgradeMULT[]
-        - basicBuilding: BasicBuilding
-        - AdvancedBuilding: AdvancedBuilding
+        - basicBuilding: BasicBuilding[]
+        - AdvancedBuilding: AdvancedBuilding[]
         %%name changed to inventory for cleaner name
         - Inventory: Purchasable[] 
         %%controller calls this for auto click through setInterval
@@ -155,8 +157,8 @@ classDiagram
     Game "1" --* "+" UpgradeADD
     Game "1" --* "+" UpgradeMULT
     
-    Game "1" --* "1" BasicBuilding
-    Game "1" --* "1" AdvancedBuilding
+    Game "1" --* "+" BasicBuilding
+    Game "1" --* "+" AdvancedBuilding
     
 %% cardinality aggregation
     Game "1" --o "1" Player

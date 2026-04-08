@@ -1,5 +1,5 @@
 import { assert } from "./Assertions";
-import { db } from "./connections";
+import { db } from "./Connections";
 import type { Game } from "./Game";
 import type { Upgrade } from "./Upgrade";
 
@@ -28,11 +28,35 @@ export class UpgradeMULT implements Upgrade{
     game_id(): number{
         return this.game.id;
     }
+
+    //loads from db to an object
+    static async loadUpgradeMULTs(game: Game): Promise<UpgradeMULT[]> {
+        const results = await db().query<{
+            name: string,
+            cost: number,
+            multfactor: number,
+            description: string
+        }>(
+            "select name, cost, multFactor, description from upgrademult where game_id = $1", 
+            [game.id]
+        );  
+
+        return results.rows.map(row => 
+            new UpgradeMULT(
+                row.name, 
+                row.cost, 
+                row.multfactor, 
+                game, 
+                row.description
+            )
+        );
+    }
     
+    //saves to db
    static async saveUpgradeMULT(upgradeMult: UpgradeMULT): Promise<UpgradeMULT> {
         const query = `
-            INSERT INTO upgrademult (name, description, cost, multFactor, game_id) 
-            VALUES ($1, $2, $3, $4, $5)
+            insert into upgrademult (name, description, cost, multFactor, game_id) 
+            values ($1, $2, $3, $4, $5)
         `;
     
         const values = [

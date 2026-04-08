@@ -1,10 +1,11 @@
 import { assert } from "./Assertions";
-import { db } from "./connections";
+import { db } from "./Connections";
 import { InvalidPasswordException } from "./Exceptions/InvalidPasswordException";
 import { InvalidUsernameException } from "./Exceptions/InvalidUsernameException";
 import { Game } from "./Game";
 import type { Listener } from "./Listeners";
 
+//The hash function to convert to PBKDF2 from normal string using a salt and using webcrypto library
 const encoder = new TextEncoder();
 
 async function hashPassword(password: string, salt: string): Promise<string> {
@@ -32,6 +33,7 @@ async function hashPassword(password: string, salt: string): Promise<string> {
         .join("");
 }
 
+//account for each players
 export class Player{
     readonly #username: string;
     #password: string;
@@ -53,10 +55,12 @@ export class Player{
         this.#checkPlayer();
     }
 
+    //helper for loading the game into the player without the setter basically a setter
     async loadSavedGame(){
         this.#game = await Game.loadGame(this);
     }
 
+    //gets all the players in the db
     static async getAllPlayers(): Promise<Array<Player>>{
         const allPlayers = new Array<Player>();
 
@@ -70,16 +74,18 @@ export class Player{
         return allPlayers;
     }   
 
+    //save the player to db
     static async savePlayer(player: Player): Promise<Player>{
         const salt = window.crypto.randomUUID();
         const hashedPassword = await hashPassword(player.password, salt);
 
-        let results = await db().query("insert into player(username, password, salt) values($1,$2,$3)",
+        let results = await db().query("insert into player(username, password, salt) values($1,$2,$3) on conflict do nothing",
             [player.username, hashedPassword, salt]
         );
         return player;
     }
 
+    //Takes a input pass as input and hashes it and checks it with the stored hash to validate
     async validatePass(pass: string):Promise<boolean>{
         let valid = false;
         const results = await db().query<{password: string, salt: string}>(
@@ -102,10 +108,12 @@ export class Player{
         this.#playerListeners.push(listener);
     }
 
+    //notifies the view to clear itself
     #notifyAll():void{
         this.#playerListeners.forEach(l => l.notify());
     }
 
+    //forcefully notified
     forcedNotify(){
         this.#notifyAll();
     }

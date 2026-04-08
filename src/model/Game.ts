@@ -2,7 +2,7 @@ import { AdvanceBuilding } from "./AdvancedBuilding";
 import { assert } from "./Assertions";
 import { BasicBuilding } from "./BasicBuilding";
 import type { Building } from "./Building";
-import { db } from "./connections";
+import { db } from "./Connections";
 import { NotSuffecientClicksException } from "./Exceptions/NotSuffecientClicksException";
 import type { Listener } from "./Listeners";
 import type { Player } from "./Player";
@@ -40,6 +40,8 @@ export class Game{
         this.#checkGame();
     }
 
+
+    //gets the whole store catalog
     static async getStoreCatalog(game: Game): Promise<Purchasable[]>{
         const results = await db().query<{
             name: string,
@@ -85,6 +87,7 @@ export class Game{
         return this.#id;
     }
 
+    //populates the game with the catalog
     populateStore(catalog: Purchasable[]){
         catalog.forEach((pur) =>{
             if(pur instanceof UpgradeADD){
@@ -99,17 +102,25 @@ export class Game{
         });
     }
 
+    //saves the game into db
     static async saveGame(game: Game): Promise<Game>{
-        let results = await db().query<{id:number}>("insert into game(id, totalClicks, clickDamage, player_username) values(default, $1, $2,$3) returning id",
-            [game.TotalClicks,game.clickDamage,game.playerName()]
-        );
-        if (results.rows.length > 0) {
-            // Grab the 'id' from the first row returned by RETURNING id
-            game.id = results.rows[0].id;
+        if(game.id === 0){
+            let results = await db().query<{id:number}>("insert into game(id, totalClicks, clickDamage, player_username) values(default, $1, $2,$3) returning id",
+                [game.TotalClicks,game.clickDamage,game.playerName()]
+            );
+            if (results.rows.length > 0) {
+                game.id = results.rows[0].id;
+            }
+        }else{
+            await db().query(
+                "update game set totalClicks = $1, clickDamage = $2 where id = $3",
+                [game.TotalClicks, game.clickDamage, game.id]
+            );
         }
         return game;
     }
 
+    //loads the game state of a player and turns into an object
     static async loadGame(player: Player): Promise<Game>{
         let username = player.username;
         const results = await db().query<{ id: number, totalclicks: number, clickdamage: number }>("select *from game where player_username = $1",
@@ -123,6 +134,12 @@ export class Game{
             loadedGame.id = row.id;
             loadedGame.TotalClicks = row.totalclicks;
             loadedGame.clickDamage = row.clickdamage;
+
+            (await AdvanceBuilding.loadAdvanceBuildings(loadedGame)).forEach((ab) => loadedGame.Inventory.push(ab));
+            (await BasicBuilding.loadBasicBuildings(loadedGame)).forEach((bb) => {loadedGame.Inventory.push(bb)});
+            (await UpgradeADD.loadUpgradeADDs(loadedGame)).forEach((ua) => {loadedGame.Inventory.push(ua)});
+            (await UpgradeMULT.loadUpgradeMULTs(loadedGame)).forEach((um) => {loadedGame.Inventory.push(um)});
+
         }
         return loadedGame;
     }
@@ -187,12 +204,14 @@ export class Game{
             if(purchasable instanceof UpgradeADD || purchasable instanceof UpgradeMULT){
                 this.#clickDamage = purchasable.apply(this);
                 this.#totalClicks -= purchasable.cost;
+                this.#checkGame();
                 //Updated to register every upgrade in the inventory
                 this.#inventory.push(purchasable);
                 applied = true;
             }else{
                 this.#inventory.push(purchasable);
                 this.#totalClicks -= purchasable.cost;
+                this.#checkGame();
                 applied = true;
             }
         }else{
@@ -204,10 +223,12 @@ export class Game{
         }
     }
 
+    //autoclick by checking the inventory for all the buildings using set interval in the controller
     autoClickTick(){
         this.#inventory.forEach((inven) => {
             if(inven instanceof BasicBuilding|| inven instanceof AdvanceBuilding){
                 this.#totalClicks += inven.produceClicks();
+                this.#checkGame()
             }
         });
         this.#notifyAll();

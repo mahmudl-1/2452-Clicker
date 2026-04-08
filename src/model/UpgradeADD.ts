@@ -1,6 +1,6 @@
 import { query } from "@electric-sql/pglite/template";
 import { assert } from "./Assertions";
-import { db } from "./connections";
+import { db } from "./Connections";
 import type { Game } from "./Game";
 import type { Upgrade } from "./Upgrade";
 
@@ -31,6 +31,30 @@ export class UpgradeADD implements Upgrade{
         return this.game.id;
     }
 
+    //loads from db to an object
+    static async loadUpgradeADDs(game: Game): Promise<UpgradeADD[]> {
+        const results = await db().query<{
+            name: string,
+            cost: number,
+            effect: number,
+            description: string
+        }>(
+            "select name, cost, effect, description from upgradeadd where game_id = $1", 
+            [game.id]
+        );
+
+        return results.rows.map(row => 
+            new UpgradeADD(
+                row.name, 
+                row.cost, 
+                row.effect, 
+                game, 
+                row.description
+            )
+        );
+    }
+
+    //saves the object to the db
     static async saveUpgradeADD(upgradeADD: UpgradeADD): Promise<UpgradeADD>{
         let results = await db().query("insert into upgradeadd(name, description, cost, effect, game_id) values($1,$2,$3, $4, $5)",
             [upgradeADD.name,upgradeADD.description,upgradeADD.cost,upgradeADD.effect, upgradeADD.game_id()]

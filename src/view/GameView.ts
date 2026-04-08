@@ -4,6 +4,12 @@ import type { Game } from "../model/Game";
 import type { Listener } from "../model/Listeners";
 import type { Upgrade } from "../model/Upgrade";
 
+//building images
+const itemImages: { [key: string]: string } = {
+    "Candy store": "/basicBuilding.png",
+    "Candy Factory": "/advancedBuilding.png",
+};
+
 //This is the view of the Game which has task of setting up the candy and the upgrades on the screen
 //and letting the user know of any change or recieve inputs
 export class GameView implements Listener{
@@ -26,6 +32,20 @@ export class GameView implements Listener{
         this.buildBuildings();
     }
 
+    //updates the building on every notify
+    #updateInventoryVisuals() {
+        const inventoryContainer = document.querySelector<HTMLDivElement>("#visualInventory")!;
+        if (!inventoryContainer) return;
+        inventoryContainer.innerHTML = this.#game.Inventory.map(item => {
+            const src = itemImages[item.name];
+           
+            if (src) {
+                return `<img src="${src}" width="40" title="${item.name}" style="animation: bounce 1s ease;" />`;
+            }
+            return "";
+        }).join("");
+    }
+
     //render
     notify(){
         //rerendering the view for our Candy game
@@ -42,6 +62,7 @@ export class GameView implements Listener{
             messageBox.textContent = this.#currentMessage;
             messageBox.style.color = this.#messageColour;
         }
+        this.#updateInventoryVisuals();
     }
 
     //9. Setting up the view for the objects I'm clicking
@@ -59,6 +80,8 @@ export class GameView implements Listener{
                     <p id="totalClick">
                         Total Clicks: <strong id="counter"></strong>
                     </p>
+                    <div id="visualInventory" style="display: flex; flex-wrap: wrap; gap: 5px; margin-top: 20px; justify-content: center;">
+                    </div>
                 </div>
 
                 <div class="rightSide" id="StoreSection">
@@ -83,9 +106,11 @@ export class GameView implements Listener{
         });
     }
 
+    //builds all the upgrades present to display on the screen
     buildUpgrades(){
         const upgradeSection = document.querySelector<HTMLDivElement>("#upgradeSection")!;
         const upgrades: Upgrade[]= this.#gameController.getUpgrades();
+        //placing buttons on all the upgrades present
         upgrades.forEach((up: Upgrade, index: number) =>{
             const button = document.createElement("button");
             button.id = "upButton"+ String(index);
@@ -132,6 +157,8 @@ export class GameView implements Listener{
         });
     
     }
+
+    //the building section
 
     buildBuildings(){
         const buildingSection = document.querySelector<HTMLDivElement>("#buildingSection")!;
