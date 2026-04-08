@@ -9,7 +9,7 @@ import type { Listener } from "./Listeners";
 const encoder = new TextEncoder();
 
 async function hashPassword(password: string, salt: string): Promise<string> {
-    const passwordKey = await window.crypto.subtle.importKey(
+    const passwordKey = await crypto.subtle.importKey(
         "raw",
         encoder.encode(password),
         { name: "PBKDF2" },
@@ -17,7 +17,7 @@ async function hashPassword(password: string, salt: string): Promise<string> {
         ["deriveBits", "deriveKey"]
     );
 
-    const hashBuffer = await window.crypto.subtle.deriveBits(
+    const hashBuffer = await crypto.subtle.deriveBits(
         {
             name: "PBKDF2",
             salt: encoder.encode(salt),
@@ -76,7 +76,7 @@ export class Player{
 
     //save the player to db
     static async savePlayer(player: Player): Promise<Player>{
-        const salt = window.crypto.randomUUID();
+        const salt = crypto.randomUUID();
         const hashedPassword = await hashPassword(player.password, salt);
 
         let results = await db().query("insert into player(username, password, salt) values($1,$2,$3) on conflict do nothing",

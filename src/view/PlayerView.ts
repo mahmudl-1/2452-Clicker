@@ -91,7 +91,7 @@ export class PlayerView implements Listener{
                 }else if(e instanceof InvalidPasswordException){
                     this.#showError("A password has to be more than 5 characters.");
                 }else if(e instanceof InvalidUsernameException){
-                    this.#showError("A password has to be more than 5 characters.");
+                    this.#showError("A username cannot be empty.");
                 }
             }
         };

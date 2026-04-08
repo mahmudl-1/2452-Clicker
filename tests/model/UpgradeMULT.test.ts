@@ -1,14 +1,37 @@
 import {expect, test} from 'vitest';
-import{UpgradeMULT} from '../../src/model/UpgradeMULT';
 import{Game} from '../../src/model/Game';
+import { Player } from '../../src/model/Player';
+import { UpgradeMULT } from '../../src/model/UpgradeMULT';
 
-test("Can click on the Candy", (): void => {
-    let upgrade = new UpgradeMULT("Candy worker", 1, 2);
-    let game = new Game();
-    let previousClickDmg = game.clickDamage;
-    game.click();
+test("Can buy an upgrade after clicking enough", async (): Promise<void> => {
+    const player = new Player("Bot", "123456");
+    const game = player.game;
+    
+    const catalog = await Game.getStoreCatalog(game);
+    game.populateStore(catalog);
+    
+    const previousClickDmg = game.clickDamage;
+    const upgrade = game.upgradeMULT[0];
 
-    game.buyUpgrade(upgrade);
+    
+    for (let i = 0; i < upgrade.cost; i++) {
+        game.click();
+    }
+
+    game.buyPurchasable(upgrade);
 
     expect(game.clickDamage).toBeGreaterThan(previousClickDmg);
+});
+
+test("UpgradeMultFactor is greater than 1", async (): Promise<void> => {
+    const player = new Player("Bot", "123456");
+    const game = player.game;
+    
+    const catalog = await Game.getStoreCatalog(game);
+    game.populateStore(catalog);
+    const upgrade = game.upgradeMULT[0];
+
+    if(upgrade instanceof UpgradeMULT){
+        expect(upgrade.multFactor).toBeGreaterThan(1);
+    }
 });
