@@ -63,6 +63,6 @@ The project follows an MVC-style layout:
 - SQL database (schema in `create-tables.sql`)
 - Web Crypto API for password hashing
 ## Course Information
- 
+https://umanitoba.ca/
 Developed for **COMP 2452**, Winter 2026.
 
