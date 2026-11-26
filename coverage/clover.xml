@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1775674749860" clover="3.2.0">
-  <project timestamp="1775674749860" name="All files">
+<coverage generated="1775675616386" clover="3.2.0">
+  <project timestamp="1775675616386" name="All files">
     <metrics statements="224" coveredstatements="200" conditionals="54" coveredconditionals="38" methods="80" coveredmethods="65" elements="358" coveredelements="303" complexity="0" loc="224" ncloc="224" packages="3" files="12" classes="12"/>
     <package name="2452-clicker">
       <metrics statements="0" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
@@ -34,7 +34,7 @@
       </file>
       <file name="Assertions.ts" path="D:\Manitoba\Comp2452\2452-clicker\src\model\Assertions.ts">
         <metrics statements="3" coveredstatements="3" conditionals="2" coveredconditionals="2" methods="2" coveredmethods="2"/>
-        <line num="4" count="321" type="cond" truecount="2" falsecount="0"/>
+        <line num="4" count="721" type="cond" truecount="2" falsecount="0"/>
         <line num="5" count="1" type="stmt"/>
         <line num="12" count="1" type="stmt"/>
       </file>
@@ -130,14 +130,14 @@
         <line num="153" count="2" type="stmt"/>
         <line num="157" count="1" type="stmt"/>
         <line num="161" count="10" type="stmt"/>
-        <line num="166" count="82" type="stmt"/>
-        <line num="167" count="82" type="stmt"/>
+        <line num="166" count="282" type="stmt"/>
+        <line num="167" count="282" type="stmt"/>
         <line num="172" count="1" type="stmt"/>
         <line num="173" count="1" type="stmt"/>
-        <line num="178" count="60" type="stmt"/>
-        <line num="184" count="54" type="stmt"/>
-        <line num="185" count="54" type="stmt"/>
-        <line num="186" count="54" type="stmt"/>
+        <line num="178" count="260" type="stmt"/>
+        <line num="184" count="254" type="stmt"/>
+        <line num="185" count="254" type="stmt"/>
+        <line num="186" count="254" type="stmt"/>
         <line num="190" count="8" type="stmt"/>
         <line num="194" count="12" type="stmt"/>
         <line num="203" count="5" type="stmt"/>

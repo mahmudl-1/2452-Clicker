@@ -9,129 +9,135 @@ import type { Listener } from "./Listeners";
 const encoder = new TextEncoder();
 
 async function hashPassword(password: string, salt: string): Promise<string> {
-    const passwordKey = await crypto.subtle.importKey(
-        "raw",
-        encoder.encode(password),
-        { name: "PBKDF2" },
-        false,
-        ["deriveBits", "deriveKey"]
-    );
+  const passwordKey = await crypto.subtle.importKey(
+    "raw",
+    encoder.encode(password),
+    { name: "PBKDF2" },
+    false,
+    ["deriveBits", "deriveKey"],
+  );
 
-    const hashBuffer = await crypto.subtle.deriveBits(
-        {
-            name: "PBKDF2",
-            salt: encoder.encode(salt),
-            iterations: 10000,
-            hash: "SHA-256",
-        },
-        passwordKey,
-        256
-    );
+  const hashBuffer = await crypto.subtle.deriveBits(
+    {
+      name: "PBKDF2",
+      salt: encoder.encode(salt),
+      iterations: 10000,
+      hash: "SHA-256",
+    },
+    passwordKey,
+    256,
+  );
 
-    return Array.from(new Uint8Array(hashBuffer))
-        .map(b => b.toString(16).padStart(2, "0"))
-        .join("");
+  return Array.from(new Uint8Array(hashBuffer))
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
 }
 
 //account for each players
-export class Player{
-    readonly #username: string;
-    #password: string;
-    #game: Game;
-    #playerListeners: Listener[];
+export class Player {
+  readonly #username: string;
+  #password: string;
+  #game: Game;
+  #playerListeners: Listener[];
 
-    constructor(username: string, password: string){
-        if(username.length === 0){
-            throw new InvalidUsernameException();
-        }
-        if(password.length <= 5){
-            throw new InvalidPasswordException();
-        }
-        this.#username = username;
-        this.#password = password;
-        this.#game = new Game(this);
-        this.#playerListeners = new Array<Listener>();
-        this.#notifyAll();
-        this.#checkPlayer();
+  constructor(username: string, password: string) {
+    if (username.length === 0) {
+      throw new InvalidUsernameException();
     }
-
-    //helper for loading the game into the player without the setter basically a setter
-    async loadSavedGame(){
-        this.#game = await Game.loadGame(this);
+    if (password.length <= 5) {
+      throw new InvalidPasswordException();
     }
+    this.#username = username;
+    this.#password = password;
+    this.#game = new Game(this);
+    this.#playerListeners = new Array<Listener>();
+    this.#notifyAll();
+    this.#checkPlayer();
+  }
 
-    //gets all the players in the db
-    static async getAllPlayers(): Promise<Array<Player>>{
-        const allPlayers = new Array<Player>();
+  //helper for loading the game into the player without the setter basically a setter
+  async loadSavedGame() {
+    this.#game = await Game.loadGame(this);
+  }
 
-        let results = await db()
-            .query<{username: string, password: string}>("select * from player");
+  //gets all the players in the db
+  static async getAllPlayers(): Promise<Array<Player>> {
+    const allPlayers = new Array<Player>();
 
-        results.rows.forEach((row) =>{
-            allPlayers.push(new Player(row.username, row.password));
-        });
+    let results = await db().query<{ username: string; password: string }>(
+      "select * from player",
+    );
 
-        return allPlayers;
-    }   
+    results.rows.forEach((row) => {
+      allPlayers.push(new Player(row.username, row.password));
+    });
 
-    //save the player to db
-    static async savePlayer(player: Player): Promise<Player>{
-        const salt = crypto.randomUUID();
-        const hashedPassword = await hashPassword(player.password, salt);
+    return allPlayers;
+  }
 
-        let results = await db().query("insert into player(username, password, salt) values($1,$2,$3) on conflict do nothing",
-            [player.username, hashedPassword, salt]
-        );
-        return player;
+  //save the player to db
+  static async savePlayer(player: Player): Promise<Player> {
+    const salt = crypto.randomUUID();
+    const hashedPassword = await hashPassword(player.password, salt);
+
+    let results = await db().query(
+      "insert into player(username, password, salt) values($1,$2,$3) on conflict do nothing",
+      [player.username, hashedPassword, salt],
+    );
+    return player;
+  }
+
+  //Takes a input pass as input and hashes it and checks it with the stored hash to check if they are equal
+  async validatePass(pass: string): Promise<boolean> {
+    let valid = false;
+    const results = await db().query<{ password: string; salt: string }>(
+      "select password, salt from player where username = $1",
+      [this.#username],
+    );
+
+    if (results.rows.length !== 0) {
+      const storedHash = results.rows[0].password;
+      const storedSalt = results.rows[0].salt;
+
+      const inputHash = await hashPassword(pass, storedSalt);
+
+      if (inputHash === storedHash) valid = true;
     }
+    return valid;
+  }
 
-    //Takes a input pass as input and hashes it and checks it with the stored hash to check if they are equal
-    async validatePass(pass: string):Promise<boolean>{
-        let valid = false;
-        const results = await db().query<{password: string, salt: string}>(
-            "select password, salt from player where username = $1", [this.#username]
-        );
+  registerListener(listener: Listener): void {
+    assert(listener != null, "Listener cannot be null");
+    this.#playerListeners.push(listener);
+  }
 
-        if(results.rows.length!==0){
-            const storedHash = results.rows[0].password;
-            const storedSalt = results.rows[0].salt;
+  //notifies the view to clear itself
+  #notifyAll(): void {
+    this.#playerListeners.forEach((l) => l.notify());
+  }
 
-            const inputHash = await hashPassword(pass, storedSalt);
+  //forcefully notified
+  forcedNotify() {
+    this.#notifyAll();
+  }
 
-            if(inputHash === storedHash) valid = true;
-        }
-        return valid;
-    }
+  #checkPlayer() {
+    assert(this.#username.length > 0, "A username cannot be empty.");
+    assert(
+      this.#password.length > 5,
+      "A password has to be more than 5 characters long.",
+    );
+  }
 
-    registerListener(listener: Listener): void{
-        assert(listener != null, "Listener cannot be null");
-        this.#playerListeners.push(listener);
-    }
+  get game(): Game {
+    return this.#game;
+  }
 
-    //notifies the view to clear itself
-    #notifyAll():void{
-        this.#playerListeners.forEach(l => l.notify());
-    }
+  get username(): string {
+    return this.#username;
+  }
 
-    //forcefully notified
-    forcedNotify(){
-        this.#notifyAll();
-    }
-
-    #checkPlayer(){
-        assert(this.#username.length > 0, "A username cannot be empty.");
-        assert(this.#password.length > 5, "A password has to be more than 5 characters long.");
-    }
-
-    get game(): Game{
-        return this.#game;
-    }
-
-    get username(): string{
-        return this.#username;
-    }
-
-    get password(): string{
-        return this.#password;
-    }
+  get password(): string {
+    return this.#password;
+  }
 }

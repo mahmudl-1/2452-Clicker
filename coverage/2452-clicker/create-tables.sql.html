@@ -130,24 +130,7 @@
 <a name='L65'></a><a href='#L65'>65</a>
 <a name='L66'></a><a href='#L66'>66</a>
 <a name='L67'></a><a href='#L67'>67</a>
-<a name='L68'></a><a href='#L68'>68</a>
-<a name='L69'></a><a href='#L69'>69</a>
-<a name='L70'></a><a href='#L70'>70</a>
-<a name='L71'></a><a href='#L71'>71</a>
-<a name='L72'></a><a href='#L72'>72</a>
-<a name='L73'></a><a href='#L73'>73</a>
-<a name='L74'></a><a href='#L74'>74</a>
-<a name='L75'></a><a href='#L75'>75</a>
-<a name='L76'></a><a href='#L76'>76</a>
-<a name='L77'></a><a href='#L77'>77</a>
-<a name='L78'></a><a href='#L78'>78</a>
-<a name='L79'></a><a href='#L79'>79</a>
-<a name='L80'></a><a href='#L80'>80</a>
-<a name='L81'></a><a href='#L81'>81</a>
-<a name='L82'></a><a href='#L82'>82</a>
-<a name='L83'></a><a href='#L83'>83</a>
-<a name='L84'></a><a href='#L84'>84</a>
-<a name='L85'></a><a href='#L85'>85</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L68'></a><a href='#L68'>68</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -214,31 +197,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">--drop table BasicBuilding;
---drop table AdvancedBuilding; 
---drop table UpgradeADD;
---drop table upgrademult;
---drop table game;
---drop table Player;
---drop table catalog;
-&nbsp;
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">&nbsp;
 --updated and added the salt for hashing
 create table if not exists Player(
     username varchar(255) unique not null,
@@ -301,28 +260,18 @@ create table if not exists catalog(
 );
 &nbsp;
 insert into catalog (name, item_type, description, cost, effect_value) values
-('Rolling pin', 'UpgradeADD', 'Ancient bakers swore by this. It might look simple, but its the secret to perfectly thin, crispy candies. +10 clicks', 10, 10),
-('Candy worker', 'UpgradeMULT', 'Trained in the art of rapid confectionery, this worker doubles your manual effort with professional precision.', 20, 2),
-('Candy store', 'BasicBuilding', 'The bells are chiming and the shelves are stocked! A constant stream of customers means a steady flow of clicks every second. +1 autoClick', 30, 1),
-('Candy Factory', 'AdvanceBuilding', 'A massive industrial complex dedicated to high-speed confectionery production. Steam-powered vats and conveyor belts ensure the sugar never stops moving. +10 autoClicks', 50, 10) 
-on conflict(name) do nothing;
-&nbsp;
-&nbsp;
-&nbsp;
--- for easier access to repl just copy paste removing the comment -- bars
---select * from player;
---select * from game;
---select * from upgradeadd;
---select * from upgrademult;
---select * from basicbuilding;
---select * from advancedbuilding;</pre></td></tr></table></pre>
+('Rolling pin', 'UpgradeADD', 'Ancient bakers swore by this. It might look simple, but its the secret to perfectly thin, crispy candies. +10 clicks', 50, 10),
+('Candy worker', 'UpgradeMULT', 'Trained in the art of rapid confectionery, this worker doubles your manual effort with professional precision.', 100, 2),
+('Candy store', 'BasicBuilding', 'The bells are chiming and the shelves are stocked! A constant stream of customers means a steady flow of clicks every second. +1 autoClick', 300, 1),
+('Candy Factory', 'AdvanceBuilding', 'A massive industrial complex dedicated to high-speed confectionery production. Steam-powered vats and conveyor belts ensure the sugar never stops moving. +10 autoClicks', 500, 10) 
+on conflict(name) do nothing;</pre></td></tr></table></pre>
 
                 <div class='push'></div><!-- for sticky footer -->
             </div><!-- /wrapper -->
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-04-08T18:59:09.641Z
+                at 2026-04-08T19:13:36.209Z
             </div>
         <script src="../prettify.js"></script>
         <script>
